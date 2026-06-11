@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYPSN — Korean Young Physician-Scientist Network</title>
+<meta name="description" content="KYPSN(젊은 의사과학자 네트워크) — 젊은 의사과학자의 성장 러닝메이트. 정책·창업·역량·공동연구·커리어 데이터를 잇는 비영리 네트워크.">
+<meta property="og:title" content="KYPSN — Korean Young Physician-Scientist Network">
+<meta property="og:description" content="젊은 의사과학자의 성장 러닝메이트">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1A2B4A;
+  --navy-deep:#0B1E3F;
+  --teal-mid:#356B7B;
+  --teal:#4A8B8B;
+  --teal-light:#7BB5B5;
+  --sage:#7E9897;
+  --ink:#1A2B4A;
+  --grey:#5A6B7B;
+  --paper:#FBFCFC;
+  --paper-2:#F2F6F6;
+  --white:#FFFFFF;
+  --line:rgba(26,43,74,.12);
+  --maxw:1080px;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Inter","Noto Sans KR",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);
+  color:var(--ink);
+  background:var(--paper);
+  line-height:1.65;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+/* ── Nav ── */
+nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(251,252,252,.86);
+  backdrop-filter:saturate(140%) blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brandmark{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.02em}
+.brandmark .logo{width:30px;height:30px}
+.brandmark .name{font-size:18px;color:var(--navy)}
+.nav-links{display:flex;gap:30px;font-size:14.5px;color:var(--grey)}
+.nav-links a{transition:color .18s}
+.nav-links a:hover{color:var(--teal)}
+.nav-cta{
+  font-size:14px;font-weight:500;color:var(--white);
+  background:var(--navy);padding:9px 18px;border-radius:999px;
+  transition:background .2s;
+}
+.nav-cta:hover{background:var(--teal-mid)}
+@media(max-width:760px){.nav-links{display:none}}
+
+/* ── Hero ── */
+.hero{position:relative;padding:96px 0 84px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:12.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--teal-mid);margin-bottom:22px;
+}
+.eyebrow::before{content:"";width:22px;height:1.5px;background:var(--teal)}
+h1.hero-title{
+  font-family:var(--display);font-weight:500;
+  font-size:clamp(38px,5.4vw,62px);line-height:1.04;letter-spacing:-.015em;
+  color:var(--navy);
+}
+h1.hero-title em{font-style:italic;color:var(--teal)}
+.hero-sub{
+  margin-top:26px;font-size:18px;line-height:1.62;color:var(--grey);max-width:38ch;
+}
+.hero-actions{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:15px;font-weight:500;padding:13px 24px;border-radius:999px;
+  transition:transform .15s,background .2s,box-shadow .2s;
+}
+.btn-primary{background:var(--navy);color:var(--white)}
+.btn-primary:hover{background:var(--teal-mid);transform:translateY(-1px)}
+.btn-ghost{border:1px solid var(--line);color:var(--navy)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+
+/* hero motif */
+.motif{position:relative;aspect-ratio:1;max-width:380px;margin-left:auto}
+.motif svg{width:100%;height:auto;overflow:visible}
+@media(max-width:860px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .motif{max-width:300px;margin:0 auto}
+}
+
+/* ── Mission band ── */
+.mission{background:var(--navy);color:var(--white);padding:72px 0}
+.mission .wrap{text-align:center}
+.mission .tag{font-size:12.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--teal-light);margin-bottom:18px}
+.mission blockquote{
+  font-family:var(--display);font-weight:500;font-style:italic;
+  font-size:clamp(26px,3.8vw,40px);line-height:1.28;letter-spacing:-.01em;
+  max-width:20ch;margin:0 auto;
+}
+.mission .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--sage);margin:24px auto 0}
+
+/* ── Section frame ── */
+section.block{padding:84px 0}
+.sec-head{margin-bottom:48px;max-width:60ch}
+.sec-eyebrow{font-size:12.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--teal-mid);margin-bottom:14px}
+.sec-title{font-family:var(--display);font-weight:500;font-size:clamp(28px,3.6vw,40px);line-height:1.1;letter-spacing:-.01em;color:var(--navy)}
+.sec-desc{margin-top:16px;font-size:16.5px;color:var(--grey);line-height:1.62}
+
+/* ── Activities (5 axes) ── */
+.axes{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.axis{background:var(--paper);padding:34px 30px;transition:background .25s}
+.axis:hover{background:var(--paper-2)}
+.axis:last-child{grid-column:1 / -1}
+.axis .num{font-family:var(--display);font-size:15px;font-weight:600;color:var(--teal);letter-spacing:.04em}
+.axis h3{font-size:19px;font-weight:600;color:var(--navy);margin:10px 0 9px;letter-spacing:-.01em}
+.axis p{font-size:15px;color:var(--grey);line-height:1.6}
+@media(max-width:720px){.axes{grid-template-columns:1fr}.axis:last-child{grid-column:auto}}
+
+/* ── Membership ── */
+.members{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.mcard{border:1px solid var(--line);border-radius:18px;padding:34px 32px;background:var(--white);position:relative;overflow:hidden}
+.mcard.full{border-color:rgba(74,139,139,.35)}
+.mcard .badge{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:16px}
+.mcard.full .badge{background:rgba(74,139,139,.12);color:var(--teal-mid)}
+.mcard.assoc .badge{background:rgba(90,107,123,.1);color:var(--grey)}
+.mcard h3{font-size:20px;font-weight:600;color:var(--navy);margin-bottom:12px}
+.mcard p{font-size:15px;color:var(--grey);line-height:1.62}
+@media(max-width:680px){.members{grid-template-columns:1fr}}
+
+/* ── Founders ── */
+.founders{padding:84px 0;background:var(--paper-2)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.fcard{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:34px 32px}
+.fcard .role{font-size:12.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-mid);margin-bottom:8px}
+.fcard h3{font-family:var(--display);font-size:24px;font-weight:500;color:var(--navy);margin-bottom:18px}
+.fcard ul{list-style:none}
+.fcard li{font-size:14.5px;color:var(--grey);line-height:1.5;padding-left:18px;position:relative;margin-bottom:7px}
+.fcard li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:var(--teal-light)}
+.fcard li.hi{color:var(--navy);font-weight:500}
+.fcard li.hi::before{background:var(--teal)}
+@media(max-width:680px){.fgrid{grid-template-columns:1fr}}
+
+/* ── Partner ── */
+.partner .wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:48px;align-items:center}
+.partner .note{font-size:14.5px;color:var(--grey);line-height:1.65;border-left:2px solid var(--teal-light);padding-left:20px}
+@media(max-width:680px){.partner .wrap{grid-template-columns:1fr;gap:24px}}
+
+/* ── CTA ── */
+.cta-final{background:var(--navy-deep);color:var(--white);padding:90px 0;text-align:center}
+.cta-final h2{font-family:var(--display);font-weight:500;font-size:clamp(28px,4vw,44px);line-height:1.12;letter-spacing:-.01em;max-width:18ch;margin:0 auto 20px}
+.cta-final p{color:var(--teal-light);font-size:16.5px;margin-bottom:34px}
+.cta-final .btn-primary{background:var(--teal);color:var(--white)}
+.cta-final .btn-primary:hover{background:var(--teal-light);color:var(--navy)}
+
+/* ── Footer ── */
+footer{background:var(--navy);color:rgba(255,255,255,.62);padding:48px 0 40px;font-size:13.5px}
+.foot-in{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.foot-brand{display:flex;align-items:center;gap:10px;color:var(--white);font-weight:600}
+.foot-brand .logo{width:26px;height:26px}
+.foot-meta{text-align:right;line-height:1.7}
+@media(max-width:600px){.foot-in{flex-direction:column;align-items:flex-start}.foot-meta{text-align:left}}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap nav-in">
+    <a href="#top" class="brandmark" aria-label="KYPSN 홈">
+      <svg class="logo" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M24 6c-3 3-3 6 0 8 3-2 3-5 0-8z" fill="#4A8B8B"/>
+        <path d="M24 6c3 3 3 6 0 8-3-2-3-5 0-8z" fill="#356B7B" opacity=".85"/>
+        <path d="M17 16c0 0 4 3 7 3s7-3 7-3M16 24c0 0 5 3 8 3s8-3 8-3M17 32c0 0 4 3 7 3s7-3 7-3" stroke="#1A2B4A" stroke-width="2" stroke-linecap="round"/>
+        <path d="M18 14C18 22 30 26 30 34M30 14C30 22 18 26 18 34" stroke="#1A2B4A" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="24" cy="24" r="2.4" fill="#7E9897"/>
+      </svg>
+      <span class="name">KYPSN</span>
+    </a>
+    <div class="nav-links">
+      <a href="#mission">미션</a>
+      <a href="#activities">활동</a>
+      <a href="#members">회원</a>
+      <a href="#founders">사람들</a>
+    </div>
+    <a href="#join" class="nav-cta">함께하기</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="reveal in">
+      <span class="eyebrow">Korean Young Physician-Scientist Network</span>
+      <h1 class="hero-title">의사과학자의<br>다음 단계를<br><em>함께 자라게</em></h1>
+      <p class="hero-sub">정책, 창업, 연구 역량, 공동연구, 그리고 진로 데이터까지 — 흩어진 젊은 의사과학자들을 하나의 성장 궤도로 잇는 비영리 네트워크.</p>
+      <div class="hero-actions">
+        <a href="#join" class="btn btn-primary">네트워크 합류하기 →</a>
+        <a href="#activities" class="btn btn-ghost">활동 살펴보기</a>
+      </div>
+    </div>
+    <div class="motif reveal in" aria-hidden="true">
+      <svg viewBox="0 0 360 360" fill="none">
+        <defs>
+          <linearGradient id="strand" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#356B7B"/>
+            <stop offset="1" stop-color="#7BB5B5"/>
+          </linearGradient>
+        </defs>
+        <circle cx="180" cy="180" r="150" stroke="rgba(74,139,139,.16)" stroke-width="1.5"/>
+        <circle cx="180" cy="180" r="118" stroke="rgba(74,139,139,.1)" stroke-width="1.5"/>
+        <!-- sprout -->
+        <path d="M180 52c-14 11-14 28 0 38 14-10 14-27 0-38z" fill="#4A8B8B"/>
+        <path d="M180 52c14 11 14 28 0 38-14-10-14-27 0-38z" fill="#356B7B" opacity=".82"/>
+        <!-- helix -->
+        <path d="M150 96C150 150 210 174 210 228S150 306 150 306" stroke="url(#strand)" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M210 96C210 150 150 174 150 228S210 306 210 306" stroke="var(--navy)" stroke-width="3.5" stroke-linecap="round"/>
+        <g stroke="#1A2B4A" stroke-width="2.4" stroke-linecap="round" opacity=".55">
+          <path d="M156 118 L204 118"/><path d="M150 150 L210 150"/>
+          <path d="M156 182 L204 182"/><path d="M156 226 L204 226"/>
+          <path d="M150 258 L210 258"/><path d="M156 290 L204 290"/>
+        </g>
+        <circle cx="180" cy="200" r="5.5" fill="#7E9897"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- MISSION -->
+<section class="mission" id="mission">
+  <div class="wrap reveal">
+    <div class="tag">Our Mission</div>
+    <blockquote>“젊은 의사과학자의<br>성장 러닝메이트”</blockquote>
+    <span class="dot"></span>
+  </div>
+</section>
+
+<!-- ACTIVITIES -->
+<section class="block" id="activities">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-eyebrow">What we do</div>
+      <h2 class="sec-title">다섯 개의 축으로 움직입니다</h2>
+      <p class="sec-desc">정책에서 창업, 역량 훈련, 공동연구, 데이터까지 — 의사과학자의 성장 경로 전 구간을 설계합니다.</p>
+    </div>
+    <div class="axes reveal">
+      <div class="axis">
+        <span class="num">01</span>
+        <h3>정책 소통 창구</h3>
+        <p>차세대 의사과학자 양성을 위한 정책·제도 개선 의견을 정부·유관기관에 전달하는 공식 채널.</p>
+      </div>
+      <div class="axis">
+        <span class="num">02</span>
+        <h3>창업 인큐베이팅 캠프</h3>
+        <p>디지털 헬스케어 분야의 도전적·실험적 소규모 프로젝트 및 창업 인큐베이팅 프로그램 운영.</p>
+      </div>
+      <div class="axis">
+        <span class="num">03</span>
+        <h3>역량 훈련 베이스캠프</h3>
+        <p>리서치 스킬, 논문, 그랜트 라이팅, 리더십 — 중장기 바이오메디컬 핵심 역량 훈련.</p>
+      </div>
+      <div class="axis">
+        <span class="num">04</span>
+        <h3>공동연구 역량 증진</h3>
+        <p>임상·공학·데이터사이언스 융합 연구팀 구성 — 회원 간 의과학·의공학 공동연구 매칭 및 지원.</p>
+      </div>
+      <div class="axis">
+        <span class="num">05</span>
+        <h3>커리어 가시화 리포트</h3>
+        <p>국내 MD-PhD 진로 데이터를 수집해 연간 리포트로 발행 — 정책 근거자료이자 미디어 노출 채널.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMBERS -->
+<section class="block" id="members" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-eyebrow">Who belongs</div>
+      <h2 class="sec-title">두 갈래의 회원 구조</h2>
+    </div>
+    <div class="members reveal">
+      <div class="mcard full">
+        <span class="badge">정회원 · Full</span>
+        <h3>훈련 중인 의사과학자</h3>
+        <p>40세 이하 의사(M.D.)로서 이학 또는 공학 분야의 석사·박사 과정생이거나 학위 소지자.</p>
+      </div>
+      <div class="mcard assoc">
+        <span class="badge">준회원 · Associate</span>
+        <h3>경계를 넘는 사람들</h3>
+        <p>의대생, 창업에 관심 있는 의사, 그리고 디지털 헬스케어 분야 종사자.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDERS -->
+<section class="founders" id="founders">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-eyebrow">The people</div>
+      <h2 class="sec-title">공동창립자</h2>
+    </div>
+    <div class="fgrid reveal">
+      <div class="fcard">
+        <div class="role">President · 대표</div>
+        <h3>이진규</h3>
+        <ul>
+          <li>포항공대 화학공학과 학사</li>
+          <li>경북대병원 전공의</li>
+          <li>서울대학교 바이오엔지니어링 박사과정</li>
+          <li>웨어러블 디바이스 · 피지컬 AI 연구</li>
+          <li>비영리 임의단체 人Star 대표</li>
+          <li class="hi">2020 대한민국 인재상 수상</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <div class="role">Co-founder · 부대표</div>
+        <h3>김경훈</h3>
+        <ul>
+          <li>서울아산병원 피부과 전공의</li>
+          <li>서울대학교 바이오엔지니어링 박사과정</li>
+          <li>피부 AI 스타트업 더마트릭스 대표</li>
+          <li>To be doctor 창립자 및 전 대표</li>
+          <li class="hi">2025 대한민국 인재상 수상</li>
+          <li class="hi">도전! K-스타트업 2025 왕중왕전 최우수상</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNER -->
+<section class="block partner">
+  <div class="wrap reveal">
+    <div>
+      <div class="sec-eyebrow">Ecosystem</div>
+      <h2 class="sec-title" style="font-size:clamp(24px,3vw,32px)">생태계 협력</h2>
+    </div>
+    <p class="note">블루포인트파트너스는 공식 후원사가 아닌 <strong style="color:var(--navy);font-weight:500">자문·협력기관</strong>으로 참여합니다. 예비창업 회원 대상 투자 연계와 멘토링, 특강 연사·심사위원 참여, 공공기술사업화 연계 등 헬스케어 스타트업 생태계를 순수하게 지원하는 구조로 운영됩니다.</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-final" id="join">
+  <div class="wrap reveal">
+    <h2>아직 꽃피지 않은 새싹이라면, 같이 자랍시다</h2>
+    <p>의학적 문제를 연구로 풀기 위해 훈련 중인 모든 이들에게 열려 있습니다.</p>
+    <a href="mailto:contact@kypsn.org" class="btn btn-primary">합류 문의하기 →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <svg class="logo" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M24 6c-3 3-3 6 0 8 3-2 3-5 0-8z" fill="#7BB5B5"/>
+        <path d="M24 6c3 3 3 6 0 8-3-2-3-5 0-8z" fill="#4A8B8B"/>
+        <path d="M18 14C18 22 30 26 30 34M30 14C30 22 18 26 18 34" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="24" cy="24" r="2.4" fill="#7E9897"/>
+      </svg>
+      KYPSN
+    </div>
+    <div class="foot-meta">
+      Korean Young Physician-Scientist Network<br>
+      젊은 의사과학자 네트워크 · 비영리 단체 · 2026
+    </div>
+  </div>
+</footer>
+
+<script>
+const io=new IntersectionObserver((es)=>{
+  es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
