@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYPSN — Korean Young Physician-Scientist Network</title>
+<meta name="description" content="KYPSN(한국젊은의사과학자네트워크)은 젊은 의사과학자의 성장 러닝메이트입니다. 정책, 창업, 연구 역량, 공동연구, 진로 데이터를 잇는 비영리 네트워크.">
+<meta property="og:title" content="KYPSN — Korean Young Physician-Scientist Network">
+<meta property="og:description" content="젊은 의사과학자의 성장 러닝메이트">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kypsn.org">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%231A2B4A'/%3E%3Cpath d='M24 7c-3.5 3.5-3.5 7 0 9.5 3.5-2.5 3.5-6 0-9.5z' fill='%237BB5B5'/%3E%3Cpath d='M18 17c0 8 12 11 12 18M30 17c0 8-12 11-12 18' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1A2B4A;
+  --navy-deep:#0E1D38;
+  --teal-mid:#356B7B;
+  --teal:#4A8B8B;
+  --teal-light:#7BB5B5;
+  --mist:#DCEAEA;
+  --sage:#7E9897;
+  --sand:#E9C98F;
+  --grey:#56677A;
+  --paper:#FBFCFC;
+  --paper-2:#F1F6F6;
+  --white:#FFFFFF;
+  --line:rgba(26,43,74,.12);
+  --maxw:1120px;
+  --display:"Fraunces","Noto Serif KR",Georgia,serif;
+  --serif-kr:"Noto Serif KR","Fraunces",serif;
+  --body:"Noto Sans KR","Apple SD Gothic Neo",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);color:var(--navy);background:var(--paper);line-height:1.7;font-size:16px;-webkit-font-smoothing:antialiased;word-break:keep-all}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:6px}
+svg{display:block}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:rgba(251,252,252,.82);backdrop-filter:saturate(150%) blur(12px);-webkit-backdrop-filter:saturate(150%) blur(12px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:.03em;font-size:18px}
+.brand svg{width:32px;height:32px}
+.nav-links{display:flex;gap:28px;font-size:14.5px;color:var(--grey)}
+.nav-links a:hover{color:var(--teal-mid)}
+.nav-cta{font-size:14px;font-weight:500;color:#fff;background:var(--navy);padding:9px 18px;border-radius:999px;transition:background .2s}
+.nav-cta:hover{background:var(--teal-mid)}
+@media(max-width:820px){.nav-links{display:none}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:88px 0 96px;background:
+  radial-gradient(900px 520px at 88% 30%,rgba(123,181,181,.22),transparent 60%),
+  radial-gradient(700px 480px at 8% 100%,rgba(233,201,143,.16),transparent 60%),var(--paper)}
+.hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:40px;align-items:center}
+.hero .kicker{font-family:var(--display);font-style:italic;font-size:17px;color:var(--teal-mid);margin-bottom:18px}
+.hero h1{font-family:var(--serif-kr);font-weight:700;font-size:clamp(40px,5.6vw,66px);line-height:1.18;letter-spacing:-.02em}
+.hero h1 .soft{color:var(--teal-mid)}
+.hero-sub{margin-top:26px;font-size:18px;color:var(--grey);max-width:34em}
+.hero-actions{margin-top:36px;display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;padding:13px 24px;border-radius:999px;transition:transform .15s,background .2s,border-color .2s,color .2s}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:var(--teal-mid);transform:translateY(-1px)}
+.btn-ghost{border:1px solid var(--line);color:var(--navy);background:rgba(255,255,255,.6)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal-mid)}
+.orbit{width:100%;max-width:520px;margin-left:auto;height:auto}
+.orbit .lbl{font-family:var(--body);font-size:13px;font-weight:500;fill:var(--navy)}
+.orbit .lbl-sub{font-family:var(--body);font-size:11px;fill:var(--grey)}
+@media(prefers-reduced-motion:no-preference){
+  .spin-slow{transform-origin:260px 260px;animation:spin 90s linear infinite}
+  .spin-rev{transform-origin:260px 260px;animation:spin 140s linear infinite reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .grow{transform-origin:260px 232px;animation:grow 1.4s cubic-bezier(.2,.8,.2,1) .2s both}
+  @keyframes grow{from{transform:scale(.2);opacity:0}to{transform:none;opacity:1}}
+  .pulse{animation:pulse 3.2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.35}50%{opacity:.9}}
+}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}.orbit{margin:8px auto 0;max-width:420px}.hero{padding:56px 0 72px}}
+
+/* mission band */
+.mission{position:relative;background:var(--navy);color:#fff;padding:84px 0;overflow:hidden}
+.mission .helix-bg{position:absolute;inset:0;opacity:.13;pointer-events:none}
+.mission .wrap{position:relative;text-align:center}
+.mission .tag{font-family:var(--display);font-style:italic;color:var(--teal-light);font-size:17px;margin-bottom:16px}
+.mission blockquote{font-family:var(--serif-kr);font-weight:700;font-size:clamp(28px,4vw,44px);line-height:1.35;letter-spacing:-.01em}
+.mission p{margin:22px auto 0;max-width:36em;color:rgba(255,255,255,.72);font-size:16.5px}
+
+/* section frame */
+section.block{padding:96px 0}
+.sec-head{margin-bottom:52px;max-width:40em}
+.sec-kicker{font-family:var(--display);font-style:italic;font-size:16px;color:var(--teal-mid);margin-bottom:10px}
+.sec-title{font-family:var(--serif-kr);font-weight:700;font-size:clamp(28px,3.6vw,40px);line-height:1.3;letter-spacing:-.015em}
+.sec-desc{margin-top:14px;font-size:16.5px;color:var(--grey)}
+
+/* pillars */
+.pillars{display:grid;grid-template-columns:repeat(6,1fr);gap:20px}
+.pillar{grid-column:span 2;background:var(--white);border:1px solid var(--line);border-radius:22px;padding:30px 28px 30px;position:relative;overflow:hidden;transition:border-color .25s,transform .25s}
+.pillar:hover{border-color:rgba(74,139,139,.45);transform:translateY(-2px)}
+.pillar:nth-child(4),.pillar:nth-child(5){grid-column:span 3}
+.pillar .ic{width:64px;height:64px;margin-bottom:20px}
+.pillar h3{font-size:19px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em}
+.pillar p{font-size:15px;color:var(--grey);line-height:1.65}
+.pillar .wash{position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(123,181,181,.18),transparent 70%)}
+@media(max-width:900px){.pillars{grid-template-columns:1fr 1fr}.pillar,.pillar:nth-child(4),.pillar:nth-child(5){grid-column:span 1}.pillar:nth-child(5){grid-column:1/-1}}
+@media(max-width:600px){.pillars{grid-template-columns:1fr}.pillar:nth-child(5){grid-column:auto}}
+
+/* roadmap */
+.roadmap{background:var(--paper-2)}
+.road{position:relative;margin-top:8px}
+.road svg.path{width:100%;height:auto;overflow:visible}
+.stops{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:-6px}
+.stop .when{font-family:var(--display);font-size:15px;color:var(--teal-mid);font-style:italic}
+.stop h3{font-size:19px;font-weight:700;margin:4px 0 8px}
+.stop p{font-size:15px;color:var(--grey)}
+@media(max-width:760px){.road svg.path{display:none}.stops{grid-template-columns:1fr;gap:22px}.stop{border-left:2px solid var(--teal-light);padding-left:18px}}
+
+/* members */
+.members{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.mcard{border:1px solid var(--line);border-radius:24px;background:var(--white);overflow:hidden;display:flex;flex-direction:column}
+.mcard .art{height:180px;background:var(--mist)}
+.mcard.assoc .art{background:#F4EEDF}
+.mcard .art svg{width:100%;height:100%}
+.mcard .txt{padding:28px 30px 32px}
+.mcard .badge{display:inline-block;font-size:13px;font-weight:500;padding:4px 12px;border-radius:999px;margin-bottom:14px;background:rgba(74,139,139,.12);color:var(--teal-mid)}
+.mcard.assoc .badge{background:rgba(180,140,70,.14);color:#8A6A2E}
+.mcard h3{font-size:21px;font-weight:700;margin-bottom:10px}
+.mcard p{font-size:15.5px;color:var(--grey)}
+@media(max-width:720px){.members{grid-template-columns:1fr}}
+
+/* event */
+.event{background:var(--navy-deep);color:#fff;padding:96px 0;position:relative;overflow:hidden}
+.event-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.event .sec-kicker{color:var(--sand)}
+.event .sec-title{color:#fff}
+.event .date{font-family:var(--serif-kr);font-size:22px;margin:18px 0 14px;color:var(--sand)}
+.event p{color:rgba(255,255,255,.74);font-size:16px;max-width:30em}
+.event .note{margin-top:18px;font-size:14.5px;color:rgba(255,255,255,.55)}
+.table-art{width:100%;max-width:440px;margin:0 auto}
+@media(max-width:860px){.event-grid{grid-template-columns:1fr;gap:36px}}
+
+/* founders */
+.founders{padding:96px 0}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.fcard{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:32px;display:grid;grid-template-columns:84px 1fr;gap:22px;align-items:start}
+.avatar{width:84px;height:84px}
+.fcard .role{font-size:13.5px;color:var(--teal-mid);font-weight:500}
+.fcard h3{font-family:var(--serif-kr);font-size:24px;font-weight:700;margin:2px 0 14px}
+.fcard ul{list-style:none}
+.fcard li{font-size:14.5px;color:var(--grey);line-height:1.5;padding-left:16px;position:relative;margin-bottom:7px}
+.fcard li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:var(--teal-light)}
+.fcard li.hi{color:var(--navy);font-weight:500}
+.fcard li.hi::before{background:var(--sand)}
+@media(max-width:860px){.fgrid{grid-template-columns:1fr}}
+@media(max-width:440px){.fcard{grid-template-columns:1fr}}
+
+/* partner */
+.partner{padding:0 0 96px}
+.partner-box{display:grid;grid-template-columns:200px 1fr;gap:36px;align-items:center;border:1px solid var(--line);border-radius:24px;padding:34px 38px;background:linear-gradient(120deg,var(--white),var(--paper-2))}
+.partner-box svg{width:100%;max-width:200px}
+.partner-box h2{font-family:var(--serif-kr);font-size:24px;font-weight:700;margin-bottom:10px}
+.partner-box p{font-size:15.5px;color:var(--grey)}
+.partner-box strong{color:var(--navy);font-weight:500}
+@media(max-width:720px){.partner-box{grid-template-columns:1fr;gap:18px;padding:28px}.partner-box svg{max-width:150px}}
+
+/* cta */
+.cta{position:relative;background:var(--navy);color:#fff;padding:100px 0 0;text-align:center;overflow:hidden}
+.cta h2{font-family:var(--serif-kr);font-weight:700;font-size:clamp(28px,4vw,44px);line-height:1.3;max-width:16em;margin:0 auto 18px}
+.cta p{color:var(--teal-light);font-size:16.5px;margin-bottom:32px}
+.cta .btn-primary{background:var(--teal);color:#fff}
+.cta .btn-primary:hover{background:var(--teal-light);color:var(--navy)}
+.cta .field{width:100%;height:auto;margin-top:64px}
+
+/* footer */
+footer{background:var(--navy-deep);color:rgba(255,255,255,.6);padding:44px 0 40px;font-size:13.5px}
+.foot-in{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;line-height:1.8}
+.foot-brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;margin-bottom:6px}
+.foot-brand svg{width:26px;height:26px}
+.foot-in a{color:var(--teal-light)}
+.foot-right{text-align:right}
+@media(max-width:640px){.foot-right{text-align:left}}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a href="#top" class="brand" aria-label="KYPSN 홈">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M24 5c-4 3.8-4 7.6 0 10.4 4-2.8 4-6.6 0-10.4z" fill="#4A8B8B"/>
+        <path d="M24 5c4 3.8 4 7.6 0 10.4-4-2.8-4-6.6 0-10.4z" fill="#356B7B" opacity=".85"/>
+        <path d="M18 16C18 24 30 27 30 35M30 16C30 24 18 27 18 35" stroke="#1A2B4A" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M19.5 20h9M19.5 31h9" stroke="#1A2B4A" stroke-width="1.8" stroke-linecap="round" opacity=".55"/>
+        <circle cx="24" cy="25.5" r="2.4" fill="#7E9897"/>
+      </svg>
+      KYPSN
+    </a>
+    <div class="nav-links">
+      <a href="#mission">미션</a>
+      <a href="#activities">활동</a>
+      <a href="#roadmap">로드맵</a>
+      <a href="#members">회원</a>
+      <a href="#event">행사</a>
+      <a href="#founders">사람들</a>
+    </div>
+    <a href="#join" class="nav-cta">함께하기</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="reveal in">
+      <p class="kicker">Korean Young Physician-Scientist Network</p>
+      <h1>의사과학자의<br>다음 단계를<br><span class="soft">함께 자라게</span></h1>
+      <p class="hero-sub">병원과 연구실, 창업 현장에 흩어진 젊은 의사과학자들을 한 궤도로 잇는 비영리 네트워크입니다. 정책, 창업, 연구 역량, 공동연구, 진로 데이터를 함께 다룹니다.</p>
+      <div class="hero-actions">
+        <a href="#join" class="btn btn-primary">네트워크 합류 문의</a>
+        <a href="#activities" class="btn btn-ghost">활동 살펴보기</a>
+      </div>
+    </div>
+
+    <svg class="orbit reveal in" viewBox="0 0 520 520" fill="none" role="img" aria-label="중앙의 새싹과 DNA 나선을 병원, 연구실, 창업, 정책 네 개의 점이 궤도를 그리며 둘러싼 그림">
+      <defs>
+        <linearGradient id="gStrand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#356B7B"/><stop offset="1" stop-color="#7BB5B5"/></linearGradient>
+        <radialGradient id="gCore" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCEAEA"/></radialGradient>
+      </defs>
+      <circle cx="260" cy="260" r="236" stroke="rgba(26,43,74,.08)" stroke-width="1"/>
+      <circle class="spin-slow" cx="260" cy="260" r="190" stroke="rgba(74,139,139,.28)" stroke-width="1.3" stroke-dasharray="3 7"/>
+      <circle cx="260" cy="260" r="132" stroke="rgba(74,139,139,.2)" stroke-width="1.3"/>
+      <circle cx="260" cy="260" r="104" fill="url(#gCore)"/>
+
+      <!-- outer orbit: 4 nodes -->
+      <g>
+        <g transform="translate(260 70)">
+          <circle r="30" fill="#fff" stroke="#4A8B8B" stroke-width="1.5"/>
+          <path d="M-9 -2h18M0 -11v18" stroke="#356B7B" stroke-width="3.2" stroke-linecap="round"/>
+        </g>
+        <g transform="translate(450 260)">
+          <circle r="30" fill="#fff" stroke="#4A8B8B" stroke-width="1.5"/>
+          <path d="M-5 -12h10M-3 -12v8l-8 13c-1 2 0 4 2 4h18c2 0 3-2 2-4l-8-13v-8" stroke="#356B7B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M-7 4h14" stroke="#7BB5B5" stroke-width="2.2" stroke-linecap="round"/>
+        </g>
+        <g transform="translate(260 450)">
+          <circle r="30" fill="#fff" stroke="#E9C98F" stroke-width="1.8"/>
+          <path d="M0 11V-2M0 -2c-8 0-11-6-11-10 6 0 11 3 11 10zM0 1c7 0 10-5 10-9-6 0-10 3-10 9z" stroke="#8A6A2E" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        </g>
+        <g transform="translate(70 260)">
+          <circle r="30" fill="#fff" stroke="#4A8B8B" stroke-width="1.5"/>
+          <path d="M-12 9h24M-10 5V-3M-3.5 5V-3M3.5 5V-3M10 5V-3M-13 -5L0 -13l13 8" stroke="#356B7B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        </g>
+      </g>
+
+      <!-- inner orbit: small satellites -->
+      <g class="spin-rev">
+        <circle cx="260" cy="128" r="5" fill="#7BB5B5"/>
+        <circle cx="392" cy="260" r="4" fill="#E9C98F"/>
+        <circle cx="167" cy="353" r="4.5" fill="#4A8B8B"/>
+        <circle cx="167" cy="167" r="3.5" fill="#7E9897"/>
+      </g>
+
+      <!-- connecting beams -->
+      <g stroke="#4A8B8B" stroke-width="1" opacity=".35" class="pulse">
+        <path d="M260 104 L260 156"/><path d="M416 260 L364 260"/><path d="M260 416 L260 364"/><path d="M104 260 L156 260"/>
+      </g>
+
+      <!-- core: sprout + helix -->
+      <g class="grow">
+        <path d="M260 168c-17 13-17 33 0 45 17-12 17-32 0-45z" fill="#4A8B8B"/>
+        <path d="M260 168c17 13 17 33 0 45-17-12-17-32 0-45z" fill="#356B7B" opacity=".85"/>
+        <path d="M236 216C236 262 284 280 284 326M284 216C284 262 236 280 236 326" stroke-width="4" stroke-linecap="round" stroke="url(#gStrand)"/>
+        <path d="M284 216C284 262 236 280 236 326" stroke="#1A2B4A" stroke-width="4" stroke-linecap="round"/>
+        <g stroke="#1A2B4A" stroke-width="2.4" stroke-linecap="round" opacity=".5">
+          <path d="M241 232h38"/><path d="M252 250h16"/><path d="M252 292h16"/><path d="M241 310h38"/>
+        </g>
+        <circle cx="260" cy="271" r="6" fill="#E9C98F"/>
+      </g>
+
+      <text class="lbl" x="260" y="28" text-anchor="middle">병원</text>
+      <text class="lbl" x="500" y="224" text-anchor="middle">연구실</text>
+      <text class="lbl" x="260" y="504" text-anchor="middle">창업</text>
+      <text class="lbl" x="22" y="224" text-anchor="middle">정책</text>
+    </svg>
+  </div>
+</header>
+
+<!-- MISSION -->
+<section class="mission" id="mission">
+  <svg class="helix-bg" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 150 C 100 40, 200 40, 300 150 S 500 260, 600 150 S 800 40, 900 150 S 1100 260, 1200 150" stroke="#7BB5B5" stroke-width="2" fill="none"/>
+    <path d="M0 150 C 100 260, 200 260, 300 150 S 500 40, 600 150 S 800 260, 900 150 S 1100 40, 1200 150" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+    <g stroke="#FFFFFF" stroke-width="1.4" opacity=".7">
+      <path d="M75 95v110M225 95v110M375 95v110M525 95v110M675 95v110M825 95v110M975 95v110M1125 95v110"/>
+    </g>
+  </svg>
+  <div class="wrap reveal">
+    <p class="tag">Our mission</p>
+    <blockquote>젊은 의사과학자의<br>성장 러닝메이트</blockquote>
+    <p>병원에서는 연구하는 의사가 드물고, 연구실과 회사에서는 임상을 아는 사람이 드뭅니다. 그 사이에 선 사람들이 물어볼 선배와 비교할 동료를 찾을 수 있도록 KYPSN이 만들어졌습니다.</p>
+  </div>
+</section>
+
+<!-- ACTIVITIES -->
+<section class="block" id="activities">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-kicker">What we do</p>
+      <h2 class="sec-title">다섯 개의 축으로 움직입니다</h2>
+      <p class="sec-desc">정책 제언부터 창업, 역량 훈련, 공동연구, 진로 데이터까지 의사과학자가 성장하는 경로 전체를 다룹니다.</p>
+    </div>
+    <div class="pillars reveal">
+      <article class="pillar">
+        <span class="wash"></span>
+        <svg class="ic" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <rect width="64" height="64" rx="18" fill="#DCEAEA"/>
+          <path d="M16 44h32M19 40V27M27 40V27M37 40V27M45 40V27M14 25L32 15l18 10z" stroke="#1A2B4A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="32" cy="21" r="2" fill="#4A8B8B"/>
+        </svg>
+        <h3>정책 소통 창구</h3>
+        <p>차세대 의사과학자 양성을 위한 제도 개선 의견을 모아 정부와 유관기관에 전달합니다.</p>
+      </article>
+      <article class="pillar">
+        <span class="wash"></span>
+        <svg class="ic" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <rect width="64" height="64" rx="18" fill="#F4EEDF"/>
+          <path d="M22 48h20l-2-10H24z" fill="#E9C98F" stroke="#8A6A2E" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M32 38V26M32 30c-8 0-11-6-11-11 7 0 11 4 11 11zM32 27c6-1 9-6 9-10-6 0-9 4-9 10z" stroke="#1A2B4A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M44 20l4-4m0 0h-4m4 0v4" stroke="#4A8B8B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>창업 인큐베이팅 캠프</h3>
+        <p>디지털 헬스케어 분야의 실험적인 소규모 프로젝트와 창업 인큐베이팅 프로그램을 운영합니다.</p>
+      </article>
+      <article class="pillar">
+        <span class="wash"></span>
+        <svg class="ic" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <rect width="64" height="64" rx="18" fill="#DCEAEA"/>
+          <path d="M14 46l12-20 8 11 6-8 10 17z" fill="#FFFFFF" stroke="#1A2B4A" stroke-width="2.2" stroke-linejoin="round"/>
+          <path d="M26 26v-9l7 3-7 3" fill="#4A8B8B" stroke="#356B7B" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M20 46l6-8 4 5" stroke="#7BB5B5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>역량 훈련 베이스캠프</h3>
+        <p>리서치 스킬, 논문과 그랜트 라이팅, 리더십처럼 오래 쓰일 바이오메디컬 핵심 역량을 함께 훈련합니다.</p>
+      </article>
+      <article class="pillar">
+        <span class="wash"></span>
+        <svg class="ic" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <rect width="64" height="64" rx="18" fill="#DCEAEA"/>
+          <circle cx="25" cy="30" r="11" stroke="#1A2B4A" stroke-width="2.2"/>
+          <circle cx="39" cy="30" r="11" stroke="#4A8B8B" stroke-width="2.2"/>
+          <path d="M32 22c2.5 2 4 4.9 4 8s-1.5 6-4 8c-2.5-2-4-4.9-4-8s1.5-6 4-8z" fill="#7BB5B5"/>
+          <path d="M22 47h20" stroke="#1A2B4A" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <h3>공동연구 역량 증진</h3>
+        <p>임상, 공학, 데이터사이언스가 섞인 연구팀을 꾸리고, 회원 간 의과학·의공학 공동연구를 연결합니다.</p>
+      </article>
+      <article class="pillar">
+        <span class="wash"></span>
+        <svg class="ic" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <rect width="64" height="64" rx="18" fill="#F4EEDF"/>
+          <path d="M16 46c6 0 6-10 12-10s6 6 12 6 4-16 8-20" stroke="#1A2B4A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <circle cx="16" cy="46" r="3" fill="#4A8B8B"/><circle cx="28" cy="36" r="3" fill="#4A8B8B"/><circle cx="40" cy="42" r="3" fill="#4A8B8B"/>
+          <path d="M48 22v-6l5 3-5 3" fill="#E9C98F" stroke="#8A6A2E" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+        <h3>커리어 가시화 리포트</h3>
+        <p>국내 MD-PhD의 진로 데이터를 모아 연간 리포트로 펴냅니다. 다음 사람이 덜 헤매도록 먼저 간 길을 지도로 남깁니다.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="block roadmap" id="roadmap">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-kicker">Roadmap</p>
+      <h2 class="sec-title">첫해는 듣는 데 씁니다</h2>
+      <p class="sec-desc">규모를 서둘러 키우지 않습니다. 먼저 젊은 의사과학자들의 이야기를 깊이 듣고, 그 결과를 바탕으로 프로그램을 설계합니다.</p>
+    </div>
+    <div class="road reveal">
+      <svg class="path" viewBox="0 0 1064 60" fill="none" aria-hidden="true">
+        <path d="M14 30 H1050" stroke="#7BB5B5" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/>
+        <circle cx="14" cy="30" r="11" fill="#fff" stroke="#356B7B" stroke-width="2.5"/><circle cx="14" cy="30" r="4.5" fill="#356B7B"/>
+        <circle cx="369" cy="30" r="11" fill="#fff" stroke="#356B7B" stroke-width="2.5"/><circle cx="369" cy="30" r="4.5" fill="#4A8B8B"/>
+        <circle cx="724" cy="30" r="11" fill="#fff" stroke="#8A6A2E" stroke-width="2.5"/><circle cx="724" cy="30" r="4.5" fill="#E9C98F"/>
+      </svg>
+      <div class="stops">
+        <div class="stop">
+          <p class="when">2026</p>
+          <h3>듣는 해</h3>
+          <p>젊은 의사과학자들을 한 사람씩 깊이 인터뷰해 지금 어디가 막혀 있는지 기록합니다.</p>
+        </div>
+        <div class="stop">
+          <p class="when">2026년 말</p>
+          <h3>첫 보고서와 첫 모임</h3>
+          <p>인터뷰 결과를 보고서로 정리하고, 12월 KYPSN Night에서 처음으로 한자리에 모입니다.</p>
+        </div>
+        <div class="stop">
+          <p class="when">2027</p>
+          <h3>프로그램 확장</h3>
+          <p>보고서를 바탕으로 회원 모집과 다섯 개 축의 프로그램을 본격적으로 시작합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMBERS -->
+<section class="block" id="members">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-kicker">Who belongs</p>
+      <h2 class="sec-title">두 갈래의 회원 구조</h2>
+    </div>
+    <div class="members reveal">
+      <article class="mcard full">
+        <div class="art">
+          <svg viewBox="0 0 520 180" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true">
+            <g stroke="#4A8B8B" stroke-width="1" opacity=".35"><path d="M0 40h520M0 90h520M0 140h520M60 0v180M160 0v180M260 0v180M360 0v180M460 0v180"/></g>
+            <path d="M190 150c0-44 30-64 70-64s70 20 70 64" fill="#FFFFFF" stroke="#1A2B4A" stroke-width="2.4"/>
+            <circle cx="260" cy="58" r="26" fill="#FFFFFF" stroke="#1A2B4A" stroke-width="2.4"/>
+            <path d="M232 100c-4 18 0 30 12 34M288 100c4 18 0 30-12 34" stroke="#356B7B" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="276" cy="136" r="6" fill="#4A8B8B"/>
+            <path d="M360 60h40v30h30M400 60v-26h36M120 70h-30v40H60M130 118h-44" stroke="#356B7B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="430" cy="90" r="5" fill="#356B7B"/><circle cx="436" cy="34" r="5" fill="#7BB5B5"/><circle cx="60" cy="110" r="5" fill="#356B7B"/><circle cx="86" cy="118" r="5" fill="#7BB5B5"/>
+          </svg>
+        </div>
+        <div class="txt">
+          <span class="badge">정회원 · Full</span>
+          <h3>훈련 중인 의사과학자</h3>
+          <p>40세 이하 의사(M.D.)로서 이학 또는 공학 분야의 석사·박사 과정생이거나 학위 소지자.</p>
+        </div>
+      </article>
+      <article class="mcard assoc">
+        <div class="art">
+          <svg viewBox="0 0 520 180" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true">
+            <path d="M0 150h520" stroke="#8A6A2E" stroke-width="1.5" opacity=".4"/>
+            <path d="M110 150 C 190 60, 330 60, 410 150" stroke="#1A2B4A" stroke-width="3" stroke-linecap="round"/>
+            <g stroke="#1A2B4A" stroke-width="1.8" opacity=".6"><path d="M160 106v44M210 84v66M260 78v72M310 84v66M360 106v44"/></g>
+            <circle cx="120" cy="128" r="14" fill="#FFFFFF" stroke="#8A6A2E" stroke-width="2.2"/>
+            <circle cx="400" cy="128" r="14" fill="#FFFFFF" stroke="#356B7B" stroke-width="2.2"/>
+            <circle cx="260" cy="66" r="10" fill="#E9C98F"/>
+            <path d="M48 150v-34l18-12 18 12v34M436 150v-48h40v48" stroke="#8A6A2E" stroke-width="2" stroke-linejoin="round" opacity=".7"/>
+          </svg>
+        </div>
+        <div class="txt">
+          <span class="badge">준회원 · Associate</span>
+          <h3>경계를 넘는 사람들</h3>
+          <p>의대생, 창업에 관심 있는 의사, 그리고 디지털 헬스케어 분야 종사자.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- EVENT -->
+<section class="event" id="event">
+  <div class="wrap event-grid">
+    <div class="reveal">
+      <p class="sec-kicker">2026 KYPSN Night</p>
+      <h2 class="sec-title">Crossing Point</h2>
+      <p class="date">12월 5일 토요일 저녁 · 서울 명동</p>
+      <p>병원 안과 밖에서 각자의 길을 만든 연사들과 같은 테이블에 앉아 식사하며 이야기하는 소규모 디너입니다. 강연을 듣는 자리보다 대화하는 자리로 준비하고 있습니다.</p>
+      <p class="note">참가 안내는 연사 구성이 확정되면 이 페이지에 올립니다.</p>
+    </div>
+    <svg class="table-art reveal" viewBox="0 0 440 400" fill="none" role="img" aria-label="긴 식탁을 위에서 내려다본 그림. 양쪽에 의자가 놓여 있고 가운데에서 선들이 교차한다">
+      <defs><radialGradient id="gGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#E9C98F" stop-opacity=".35"/><stop offset="1" stop-color="#E9C98F" stop-opacity="0"/></radialGradient></defs>
+      <circle cx="220" cy="200" r="190" fill="url(#gGlow)"/>
+      <rect x="150" y="60" width="140" height="280" rx="70" fill="#1A2B4A" stroke="#7BB5B5" stroke-width="1.5"/>
+      <g fill="none" stroke="#E9C98F" stroke-width="1.6">
+        <circle cx="185" cy="110" r="13"/><circle cx="255" cy="110" r="13"/>
+        <circle cx="185" cy="170" r="13"/><circle cx="255" cy="170" r="13"/>
+        <circle cx="185" cy="230" r="13"/><circle cx="255" cy="230" r="13"/>
+        <circle cx="185" cy="290" r="13"/><circle cx="255" cy="290" r="13"/>
+      </g>
+      <g fill="#7BB5B5">
+        <rect x="110" y="96" width="26" height="28" rx="8"/><rect x="304" y="96" width="26" height="28" rx="8"/>
+        <rect x="110" y="156" width="26" height="28" rx="8"/><rect x="304" y="156" width="26" height="28" rx="8"/>
+        <rect x="110" y="216" width="26" height="28" rx="8"/><rect x="304" y="216" width="26" height="28" rx="8"/>
+        <rect x="110" y="276" width="26" height="28" rx="8"/><rect x="304" y="276" width="26" height="28" rx="8"/>
+      </g>
+      <rect x="206" y="26" width="28" height="26" rx="8" fill="#E9C98F"/>
+      <rect x="206" y="348" width="28" height="26" rx="8" fill="#E9C98F"/>
+      <g stroke="#FFFFFF" stroke-width="1" opacity=".45">
+        <path d="M185 110 L255 290M255 110 L185 290M185 170 L255 230M255 170 L185 230"/>
+      </g>
+      <circle cx="220" cy="200" r="7" fill="#E9C98F"/>
+    </svg>
+  </div>
+</section>
+
+<!-- FOUNDERS -->
+<section class="founders" id="founders">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-kicker">The people</p>
+      <h2 class="sec-title">공동창립자</h2>
+    </div>
+    <div class="fgrid reveal">
+      <article class="fcard">
+        <svg class="avatar" viewBox="0 0 84 84" aria-hidden="true">
+          <circle cx="42" cy="42" r="42" fill="#DCEAEA"/>
+          <path d="M20 66c3-14 12-20 22-20s19 6 22 20" fill="#4A8B8B"/>
+          <circle cx="42" cy="32" r="12" fill="#1A2B4A"/>
+          <text x="42" y="37" text-anchor="middle" font-family="Noto Serif KR,serif" font-size="14" font-weight="700" fill="#fff">이</text>
+        </svg>
+        <div>
+          <div class="role">President · 대표</div>
+          <h3>이진규</h3>
+          <ul>
+            <li>포항공대 화학공학과 학사</li>
+            <li>경북대병원 전공의</li>
+            <li>서울대학교 바이오엔지니어링 박사과정</li>
+            <li>웨어러블 디바이스 · 피지컬 AI 연구</li>
+            <li>비영리 임의단체 人Star 대표</li>
+            <li class="hi">2020 대한민국 인재상 수상</li>
+          </ul>
+        </div>
+      </article>
+      <article class="fcard">
+        <svg class="avatar" viewBox="0 0 84 84" aria-hidden="true">
+          <circle cx="42" cy="42" r="42" fill="#F4EEDF"/>
+          <path d="M20 66c3-14 12-20 22-20s19 6 22 20" fill="#E9C98F"/>
+          <circle cx="42" cy="32" r="12" fill="#1A2B4A"/>
+          <text x="42" y="37" text-anchor="middle" font-family="Noto Serif KR,serif" font-size="14" font-weight="700" fill="#fff">김</text>
+        </svg>
+        <div>
+          <div class="role">Co-founder · 부대표</div>
+          <h3>김경훈</h3>
+          <ul>
+            <li>서울아산병원 피부과 전공의</li>
+            <li>서울대학교 바이오엔지니어링 박사과정</li>
+            <li>피부 AI 스타트업 더마트릭스 대표</li>
+            <li>To be doctor 창립자 및 전 대표</li>
+            <li class="hi">2025 대한민국 인재상 수상</li>
+            <li class="hi">도전! K-스타트업 2025 왕중왕전 최우수상</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNER -->
+<section class="partner">
+  <div class="wrap">
+    <div class="partner-box reveal">
+      <svg viewBox="0 0 200 140" fill="none" aria-hidden="true">
+        <circle cx="76" cy="70" r="46" stroke="#1A2B4A" stroke-width="2.2"/>
+        <circle cx="124" cy="70" r="46" stroke="#4A8B8B" stroke-width="2.2"/>
+        <path d="M100 32c12 9 20 22 20 38s-8 29-20 38c-12-9-20-22-20-38s8-29 20-38z" fill="#DCEAEA"/>
+        <circle cx="100" cy="70" r="6" fill="#E9C98F"/>
+      </svg>
+      <div>
+        <h2>생태계 협력</h2>
+        <p>블루포인트파트너스는 공식 후원사가 아닌 <strong>자문·협력기관</strong>으로 참여합니다. 예비창업 회원을 위한 투자 연계와 멘토링, 특강 연사와 심사위원 참여, 공공기술사업화 연계로 헬스케어 스타트업 생태계를 지원합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="join">
+  <div class="wrap reveal">
+    <h2>아직 꽃피지 않은 새싹이라면,<br>같이 자랍시다</h2>
+    <p>의학적 문제를 연구로 풀기 위해 훈련 중인 모든 이들에게 열려 있습니다.</p>
+    <a href="mailto:office@kypsn.org" class="btn btn-primary">합류 문의하기</a>
+  </div>
+  <svg class="field" viewBox="0 0 1200 150" preserveAspectRatio="xMidYMax slice" fill="none" aria-hidden="true">
+    <path d="M0 120 C 200 90, 400 140, 600 112 S 1000 88, 1200 118 V150 H0z" fill="#0E1D38"/>
+    <g stroke="#7BB5B5" stroke-width="2" stroke-linecap="round">
+      <path d="M140 116v-26"/><path d="M330 124v-36"/><path d="M600 112v-52"/><path d="M860 104v-30"/><path d="M1040 110v-24"/>
+    </g>
+    <g fill="#4A8B8B">
+      <path d="M140 92c-8-2-12-9-11-15 7 1 11 7 11 15z"/><path d="M140 96c7-2 11-8 10-14-7 1-10 7-10 14z"/>
+      <path d="M330 90c-10-2-15-11-14-19 9 1 14 9 14 19z"/><path d="M330 96c9-2 14-10 13-17-9 1-13 9-13 17z"/>
+      <path d="M860 76c-8-2-12-9-11-15 7 1 11 7 11 15z"/><path d="M1040 88c7-2 11-8 10-14-7 1-10 7-10 14z"/>
+    </g>
+    <path d="M600 62c-14 11-14 27 0 36 14-9 14-25 0-36z" fill="#7BB5B5"/>
+    <path d="M600 62c14 11 14 27 0 36-14-9-14-25 0-36z" fill="#4A8B8B" opacity=".85"/>
+    <circle cx="600" cy="54" r="4" fill="#E9C98F"/>
+  </svg>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-in">
+    <div>
+      <div class="foot-brand">
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path d="M24 5c-4 3.8-4 7.6 0 10.4 4-2.8 4-6.6 0-10.4z" fill="#7BB5B5"/>
+          <path d="M24 5c4 3.8 4 7.6 0 10.4-4-2.8-4-6.6 0-10.4z" fill="#4A8B8B"/>
+          <path d="M18 16C18 24 30 27 30 35M30 16C30 24 18 27 18 35" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="24" cy="25.5" r="2.4" fill="#E9C98F"/>
+        </svg>
+        한국젊은의사과학자네트워크 (KYPSN)
+      </div>
+      대표 이진규 &nbsp;|&nbsp; 고유번호 205-82-74971<br>
+      서울특별시 종로구 창경궁로20길 32-7, 503호 (연지동)
+    </div>
+    <div class="foot-right">
+      <a href="mailto:office@kypsn.org">office@kypsn.org</a><br>
+      Korean Young Physician-Scientist Network<br>
+      비영리 단체 · 2026
+    </div>
+  </div>
+</footer>
+
+<script>
+if('IntersectionObserver' in window){
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
+}else{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'))}
+</script>
+</body>
+</html>
