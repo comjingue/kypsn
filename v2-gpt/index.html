@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta name="robots" content="noindex">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="한국젊은의사과학자네트워크(KYPSN) — 젊은 의사과학자의 성장 러닝메이트">
+  <meta name="theme-color" content="#1B2A5E">
+  <title>KYPSN | 한국젊은의사과학자네트워크</title>
+  <link rel="icon" href="../assets/favicon.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    :root {
+      --navy: #1b2a5e;
+      --navy-deep: #101b43;
+      --blue: #2f55a4;
+      --blue-soft: #e9eef9;
+      --gold: #b8912a;
+      --warm: #7a6e66;
+      --ink: #151b2e;
+      --muted: #616778;
+      --line: #dfe3eb;
+      --paper: #f6f5f1;
+      --white: #fff;
+      --max: 1200px;
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--white);
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      word-break: keep-all;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .skip-link {
+      position: fixed; top: 8px; left: 8px; z-index: 1000;
+      padding: 10px 14px; color: var(--white); background: var(--navy);
+      transform: translateY(-150%); transition: transform .2s;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .wrap { width: min(calc(100% - 48px), var(--max)); margin-inline: auto; }
+    .eyebrow {
+      margin: 0 0 14px; color: var(--blue); font-size: .76rem;
+      font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+    }
+    .section { padding: 128px 0; }
+    .section-head { display: grid; grid-template-columns: .85fr 1.15fr; gap: 64px; align-items: end; margin-bottom: 56px; }
+    .section-head h2 {
+      margin: 0; color: var(--navy); font-size: clamp(2.2rem, 4vw, 4.4rem);
+      line-height: 1.08; letter-spacing: -.055em;
+    }
+    .section-head p:last-child { max-width: 610px; margin: 0; color: var(--muted); font-size: 1.06rem; }
+    .btn {
+      display: inline-flex; min-height: 52px; align-items: center; justify-content: center; gap: 10px;
+      padding: 0 22px; border: 1px solid transparent; border-radius: 999px;
+      font-size: .94rem; font-weight: 750; transition: transform .2s, background .2s, color .2s, border-color .2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:focus-visible, .nav-link:focus-visible, .menu-toggle:focus-visible { outline: 3px solid #d7b657; outline-offset: 3px; }
+    .btn-primary { color: var(--white); background: var(--blue); }
+    .btn-primary:hover { background: var(--navy); }
+    .btn-light { color: var(--navy); background: var(--white); }
+    .btn-outline { color: var(--white); border-color: rgba(255,255,255,.38); }
+    .arrow { font-size: 1.1rem; line-height: 1; }
+
+    header {
+      position: absolute; inset: 0 0 auto; z-index: 20; height: 92px;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+    }
+    .nav { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .brand img { width: 176px; filter: brightness(0) invert(1); }
+    .nav-right { display: flex; align-items: center; gap: 32px; }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-link { color: rgba(255,255,255,.78); font-size: .9rem; font-weight: 650; }
+    .nav-link:hover { color: var(--white); }
+    .menu-toggle { display: none; padding: 8px; color: var(--white); border: 0; background: transparent; cursor: pointer; }
+    .menu-toggle span { display: block; width: 24px; height: 2px; margin: 5px 0; background: currentColor; }
+
+    .hero {
+      min-height: 880px; padding: 178px 0 86px; color: var(--white); overflow: hidden;
+      background:
+        radial-gradient(circle at 82% 23%, rgba(47,85,164,.75), transparent 28%),
+        linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 54%, #203874 100%);
+      position: relative;
+    }
+    .hero::before, .hero::after { content: ""; position: absolute; border: 1px solid rgba(255,255,255,.1); border-radius: 50%; }
+    .hero::before { width: 580px; height: 580px; right: -170px; top: 110px; }
+    .hero::after { width: 330px; height: 330px; right: -45px; top: 235px; }
+    .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr); gap: 72px; align-items: end; }
+    .hero-kicker { margin-bottom: 30px; color: #d5def4; }
+    .hero h1 { max-width: 760px; margin: 0; font-size: clamp(3.65rem, 5.8vw, 5.75rem); line-height: .96; letter-spacing: -.065em; }
+    .hero-title-en { display: block; }
+    .hero-title-en em { color: #d7b657; font-style: normal; }
+    .hero-title-sub { display: block; margin-top: 26px; color: #d7b657; font-size: clamp(1.1rem, 2vw, 1.45rem); font-weight: 550; letter-spacing: -.02em; }
+    .hero-copy { max-width: 560px; margin: 34px 0 0; color: rgba(255,255,255,.76); font-size: 1.08rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .date-card {
+      padding: 30px; color: var(--ink); background: rgba(255,255,255,.96);
+      border-radius: var(--radius); box-shadow: 0 28px 70px rgba(4,10,32,.22);
+    }
+    .date-card-top { display: flex; align-items: start; justify-content: space-between; padding-bottom: 25px; border-bottom: 1px solid var(--line); }
+    .date-month { color: var(--blue); font-size: .77rem; font-weight: 800; letter-spacing: .13em; }
+    .date-day { margin-top: 2px; color: var(--navy); font-size: 5.5rem; font-weight: 800; line-height: .9; letter-spacing: -.07em; }
+    .date-weekday { padding: 7px 11px; color: var(--blue); background: var(--blue-soft); border-radius: 999px; font-size: .73rem; font-weight: 800; letter-spacing: .08em; }
+    .event-meta { display: grid; gap: 18px; margin-top: 24px; }
+    .meta-row { display: grid; grid-template-columns: 62px 1fr; gap: 12px; }
+    .meta-row span:first-child { color: var(--warm); font-size: .77rem; font-weight: 750; }
+    .meta-row strong { color: var(--navy); font-size: .92rem; line-height: 1.45; }
+    .deadline { margin-top: 24px; padding: 15px 17px; color: var(--navy); background: var(--blue-soft); border-radius: 12px; font-size: .86rem; font-weight: 750; }
+
+    .intro { position: relative; overflow: hidden; background: var(--paper); }
+    .intro-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 80px; align-items: center; }
+    .emblem-stage {
+      display: grid; min-height: 470px; place-items: center; position: relative;
+      background: var(--navy); border-radius: 50%; box-shadow: 0 36px 80px rgba(27,42,94,.18);
+    }
+    .emblem-stage::before, .emblem-stage::after { content: ""; position: absolute; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; }
+    .emblem-stage::before { inset: 28px; }
+    .emblem-stage::after { inset: 62px; }
+    .emblem-stage img { position: relative; z-index: 1; width: min(58%, 240px); filter: drop-shadow(0 18px 28px rgba(0,0,0,.24)); }
+    .intro-copy h2 { margin: 0; color: var(--navy); font-size: clamp(3rem, 5vw, 5.2rem); line-height: 1.02; letter-spacing: -.065em; }
+    .intro-copy .lead { max-width: 650px; margin: 32px 0 0; color: var(--ink); font-size: clamp(1.2rem, 2vw, 1.55rem); font-weight: 650; line-height: 1.55; }
+    .intro-copy .body { max-width: 650px; margin: 20px 0 0; color: var(--muted); }
+    .nameplate { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 30px; color: var(--blue); font-size: .8rem; font-weight: 800; letter-spacing: .08em; }
+    .mission-rail { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 650px; margin-top: 42px; border-top: 1px solid #d8d5cd; border-bottom: 1px solid #d8d5cd; }
+    .mission-rail span { padding: 18px 4px; color: var(--navy); font-size: .84rem; font-weight: 800; letter-spacing: .12em; text-align: center; }
+    .mission-rail span + span { border-left: 1px solid #d8d5cd; }
+
+    .program { background: var(--white); }
+    .program-grid { border-top: 2px solid var(--navy); }
+    .program-row { display: grid; grid-template-columns: 150px 1fr; gap: 38px; padding: 32px 0; border-bottom: 1px solid var(--line); }
+    .program-time { color: var(--blue); font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .program-content h3 { margin: 0; color: var(--navy); font-size: 1.35rem; line-height: 1.35; letter-spacing: -.025em; }
+    .part { display: block; margin-bottom: 5px; color: var(--gold); font-size: .72rem; font-weight: 850; letter-spacing: .12em; }
+    .speaker-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+    .speaker-cards.panel { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .speaker-card { min-height: 172px; padding: 20px; background: var(--paper); border: 1px solid #ebe8e0; border-radius: 18px; }
+    .speaker-mark { display: grid; width: 38px; height: 38px; place-items: center; margin-bottom: 22px; color: var(--blue); background: var(--white); border: 1px solid var(--line); border-radius: 50%; font-size: .8rem; font-weight: 850; }
+    .speaker-card strong { display: block; color: var(--navy); font-size: 1.13rem; letter-spacing: -.02em; }
+    .speaker-card > span:not(.speaker-mark) { display: block; margin-top: 5px; color: var(--muted); font-size: .84rem; line-height: 1.5; }
+    .speaker-card .talk { margin-top: 16px; padding-top: 14px; color: var(--ink); border-top: 1px solid #dedbd4; font-weight: 650; }
+
+    .apply-band { padding: 50px 0; color: var(--white); background: var(--blue); }
+    .apply-inner { display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; }
+    .apply-inner h2 { margin: 0 0 8px; font-size: clamp(1.8rem, 3vw, 2.8rem); letter-spacing: -.04em; }
+    .apply-inner p { margin: 0; color: rgba(255,255,255,.74); }
+
+    .activities { background: var(--navy); color: var(--white); }
+    .activities .section-head h2 { color: var(--white); }
+    .activities .section-head p:last-child { color: rgba(255,255,255,.62); }
+    .activities .eyebrow { color: #d7b657; }
+    .activity-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+    .activity-card {
+      grid-column: span 2; min-height: 280px; padding: 28px; border: 1px solid rgba(255,255,255,.16);
+      border-radius: 20px; background: rgba(255,255,255,.045); transition: transform .25s, background .25s;
+    }
+    .activity-card:nth-child(4), .activity-card:nth-child(5) { grid-column: span 3; }
+    .activity-card:hover { transform: translateY(-4px); background: rgba(255,255,255,.075); }
+    .activity-no { color: #d7b657; font-size: .75rem; font-weight: 800; letter-spacing: .12em; }
+    .activity-card h3 { margin: 62px 0 14px; font-size: 1.32rem; letter-spacing: -.03em; }
+    .activity-card p { margin: 0; color: rgba(255,255,255,.62); font-size: .93rem; }
+
+    .membership { background: var(--paper); }
+    .member-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .member-card { padding: 36px; background: var(--white); border: 1px solid #e7e4dc; border-radius: var(--radius); }
+    .member-card h3 { margin: 0 0 18px; color: var(--navy); font-size: 1.35rem; }
+    .member-card p { margin: 0; color: var(--muted); }
+    .badge-card {
+      grid-column: 1 / -1; display: grid; grid-template-columns: 190px 1fr; gap: 42px;
+      align-items: center; padding: 28px 36px; background: var(--navy); border-radius: var(--radius);
+    }
+    .badge-card img { width: 170px; }
+    .badge-card .eyebrow { color: #d7b657; }
+    .badge-card h3 { margin: 0 0 10px; color: var(--white); font-size: 1.7rem; }
+    .badge-card p { margin: 0; color: rgba(255,255,255,.64); }
+
+    .founders { background: #edf0f6; }
+    .founder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .founder-card { position: relative; overflow: hidden; padding: 42px; color: var(--white); background: linear-gradient(145deg, var(--navy-deep), var(--navy)); border-radius: var(--radius); box-shadow: 0 22px 50px rgba(27,42,94,.14); }
+    .founder-card::after { content: ""; position: absolute; width: 210px; height: 210px; right: -98px; top: -105px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; }
+    .founder-identity { display: grid; grid-template-columns: 76px 1fr; gap: 22px; align-items: center; margin-bottom: 30px; }
+    .founder-mark { display: grid; width: 76px; height: 76px; place-items: center; color: var(--navy); background: #d7b657; border-radius: 50%; font-size: 1.15rem; font-weight: 850; }
+    .founder-card .role { color: #d7b657; font-size: .72rem; font-weight: 850; letter-spacing: .12em; }
+    .founder-card h3 { margin: 3px 0 0; color: var(--white); font-size: 2.45rem; line-height: 1.05; letter-spacing: -.05em; }
+    .founder-card ul { margin: 0; padding: 0; list-style: none; }
+    .founder-card li { position: relative; padding: 10px 0 10px 18px; color: rgba(255,255,255,.7); border-top: 1px solid rgba(255,255,255,.11); font-size: .91rem; }
+    .founder-card li::before { content: ""; position: absolute; left: 0; top: 18px; width: 5px; height: 5px; background: var(--gold); border-radius: 50%; }
+
+    .sponsor { padding: 72px 0; background: var(--paper); text-align: center; }
+    .sponsor .eyebrow { margin-bottom: 10px; }
+    .sponsor-name { margin: 0; color: var(--navy); font-size: clamp(1.8rem, 3.5vw, 3.2rem); font-weight: 800; letter-spacing: -.045em; }
+    .sponsor p:last-child { margin: 12px auto 0; color: var(--muted); font-size: .9rem; }
+
+    footer { padding: 64px 0 36px; color: var(--white); background: var(--navy-deep); }
+    .footer-main { display: grid; grid-template-columns: 1fr auto; gap: 50px; align-items: start; }
+    .footer-logo { width: 190px; filter: brightness(0) invert(1); }
+    .footer-tagline { margin: 20px 0 0; color: rgba(255,255,255,.56); }
+    .footer-contact { text-align: right; }
+    .footer-contact span { display: block; margin-bottom: 7px; color: rgba(255,255,255,.45); font-size: .75rem; font-weight: 750; letter-spacing: .12em; }
+    .footer-contact a { font-size: 1.2rem; font-weight: 700; }
+    .footer-bottom { margin-top: 54px; padding-top: 22px; color: rgba(255,255,255,.35); border-top: 1px solid rgba(255,255,255,.12); font-size: .77rem; }
+
+    @media (max-width: 900px) {
+      .section { padding: 96px 0; }
+      .hero { min-height: auto; }
+      .hero-grid, .intro-grid { grid-template-columns: 1fr; }
+      .hero-grid { gap: 58px; }
+      .date-card { max-width: 520px; }
+      .intro-grid { gap: 52px; }
+      .intro-copy { order: 1; }
+      .emblem-stage { order: 2; max-width: 520px; }
+      .emblem-stage { min-height: 340px; }
+      .section-head { grid-template-columns: 1fr; gap: 24px; }
+      .activity-card { grid-column: span 3; }
+      .activity-card:last-child { grid-column: 2 / span 4; }
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: min(calc(100% - 32px), var(--max)); }
+      .section { padding: 80px 0; }
+      header { height: 74px; }
+      .brand img { width: 142px; }
+      .nav-right > .btn { display: none; }
+      .menu-toggle { display: block; }
+      .nav-links {
+        position: absolute; top: 74px; left: 0; right: 0; display: none;
+        padding: 18px 16px 22px; background: var(--navy-deep); border-top: 1px solid rgba(255,255,255,.12);
+      }
+      .nav-links.is-open { display: grid; }
+      .nav-link { padding: 10px 0; }
+      .hero { padding: 126px 0 60px; }
+      .hero::before { width: 360px; height: 360px; right: -240px; }
+      .hero h1 { font-size: clamp(3rem, 13.5vw, 4rem); line-height: .98; }
+      .hero-title-sub { margin-top: 20px; line-height: 1.45; }
+      .hero-copy { font-size: .98rem; }
+      .hero-actions { display: grid; }
+      .btn { width: 100%; }
+      .date-card { padding: 24px; }
+      .date-day { font-size: 4.6rem; }
+      .meta-row { grid-template-columns: 52px 1fr; }
+      .emblem-stage { min-height: auto; aspect-ratio: 1; }
+      .section-head { margin-bottom: 38px; }
+      .section-head h2 { font-size: 2.65rem; }
+      .program-row { grid-template-columns: 1fr; gap: 10px; padding: 28px 0; }
+      .program-time { font-size: .9rem; }
+      .speaker-cards, .speaker-cards.panel { grid-template-columns: 1fr; }
+      .speaker-card { min-height: auto; }
+      .apply-inner { grid-template-columns: 1fr; gap: 28px; }
+      .activity-grid, .member-grid, .founder-grid { grid-template-columns: 1fr; }
+      .activity-card, .activity-card:nth-child(4), .activity-card:nth-child(5), .activity-card:last-child { grid-column: auto; min-height: 235px; }
+      .activity-card h3 { margin-top: 42px; }
+      .member-card, .founder-card { padding: 28px; }
+      .founder-identity { grid-template-columns: 62px 1fr; gap: 17px; }
+      .founder-mark { width: 62px; height: 62px; }
+      .founder-card h3 { font-size: 2rem; }
+      .badge-card { grid-column: auto; grid-template-columns: 1fr; gap: 24px; padding: 28px; }
+      .badge-card img { width: 132px; }
+      .footer-main { grid-template-columns: 1fr; }
+      .footer-contact { text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 바로가기</a>
+  <header>
+    <nav class="nav wrap" aria-label="주요 메뉴">
+      <a class="brand" href="#top" aria-label="KYPSN 홈">
+        <img src="../assets/logo-horizontal.png" alt="KYPSN">
+      </a>
+      <div class="nav-right">
+        <div class="nav-links" id="nav-links">
+          <a class="nav-link" href="#about">소개</a>
+          <a class="nav-link" href="#program">프로그램</a>
+          <a class="nav-link" href="#activities">주요 활동</a>
+          <a class="nav-link" href="#members">회원</a>
+          <a class="nav-link" href="#founders">공동창립자</a>
+        </div>
+        <a class="btn btn-light" href="https://forms.gle/jDQPL4hDZDeXTXLS8" target="_blank" rel="noopener">행사 신청 <span class="arrow" aria-hidden="true">↗</span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="메뉴 열기">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-grid wrap">
+        <div>
+          <p class="eyebrow hero-kicker">Korean Young Physician-Scientist Network</p>
+          <h1>
+            <span class="hero-title-en"><em>Korean Young</em><br>Physician Scientists<br>Night 2026</span>
+            <span class="hero-title-sub">From Clinic to Market, Through the Bench</span>
+          </h1>
+          <p class="hero-copy">임상·연구·사업과 융합에 관심 있는 의사면허 소지자를 위한 저녁입니다.</p>
+          <div class="hero-actions">
+            <a class="btn btn-light" href="https://forms.gle/jDQPL4hDZDeXTXLS8" target="_blank" rel="noopener">행사 신청하기 <span class="arrow" aria-hidden="true">↗</span></a>
+            <a class="btn btn-outline" href="mailto:office@kypsn.org">문의하기</a>
+          </div>
+        </div>
+        <aside class="date-card" aria-label="행사 정보">
+          <div class="date-card-top">
+            <div>
+              <div class="date-month">DECEMBER</div>
+              <div class="date-day">05</div>
+            </div>
+            <div class="date-weekday">2026 · SAT</div>
+          </div>
+          <div class="event-meta">
+            <div class="meta-row"><span>시간</span><strong>18:00–21:00</strong></div>
+            <div class="meta-row"><span>장소</span><strong>홈즈레드 명동 14층<br>온에어 스테이지</strong></div>
+            <div class="meta-row"><span>대상</span><strong>임상·연구·사업과 융합에 관심 있는 의사면허 소지자</strong></div>
+            <div class="meta-row"><span>안내</span><strong>10명 내외 · 무료 · 석식 제공</strong></div>
+          </div>
+          <div class="deadline">신청 마감 11월 20일(금) · 결과는 개별 연락</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section intro" id="about">
+      <div class="intro-grid wrap">
+        <div class="intro-copy">
+          <p class="eyebrow">About KYPSN</p>
+          <h2>젊은 의사과학자의<br>성장 러닝메이트</h2>
+          <p class="lead">임상과 연구, 창업을 함께 고민하는 젊은 의사과학자들의 비영리 네트워크입니다.</p>
+          <div class="nameplate"><span>한국젊은의사과학자네트워크</span><span>KYPSN</span></div>
+          <div class="mission-rail" aria-label="KYPSN의 연결 영역"><span>임상</span><span>연구</span><span>창업</span></div>
+        </div>
+        <div class="emblem-stage"><img src="../assets/emblem.png" alt="KYPSN 원형 엠블럼"></div>
+      </div>
+    </section>
+
+    <section class="section program" id="program">
+      <div class="wrap">
+        <div class="section-head">
+          <div><p class="eyebrow">Night 2026 · Program</p><h2>한 저녁,<br>네 개의 장면</h2></div>
+          <p>식사에서 출발해 산업 진출과 창업, 현직 의사과학자의 경험을 지나 네트워킹으로 이어집니다.</p>
+        </div>
+        <div class="program-grid">
+          <article class="program-row">
+            <div class="program-time">18:00</div>
+            <div class="program-content"><h3>입장 및 식사</h3></div>
+          </article>
+          <article class="program-row">
+            <div class="program-time">18:25</div>
+            <div class="program-content"><span class="part">PART 01</span><h3>KYPSN 출범식</h3></div>
+          </article>
+          <article class="program-row">
+            <div class="program-time">18:40</div>
+            <div class="program-content">
+              <span class="part">PART 02</span><h3>의사과학자의 산업 진출과 창업의 길</h3>
+              <div class="speaker-cards">
+                <article class="speaker-card"><span class="speaker-mark" aria-hidden="true">나</span><strong>나원주</strong><span>파인디스커버리 공동창업자</span><span class="talk">의사의 전문성은 어떻게 가치가 되는가</span></article>
+                <article class="speaker-card"><span class="speaker-mark" aria-hidden="true">박</span><strong>박수용</strong><span>블루포인트파트너스 팀장</span><span class="talk">의사 창업자 동향과 창업 시 고려사항</span></article>
+              </div>
+            </div>
+          </article>
+          <article class="program-row">
+            <div class="program-time">19:25</div>
+            <div class="program-content">
+              <span class="part">PART 03</span><h3>현직 의사과학자 패널 토론</h3>
+              <div class="speaker-cards panel">
+                <article class="speaker-card"><span class="speaker-mark" aria-hidden="true">최</span><strong>최병욱</strong><span>팬토믹스 대표 · MD, PhD</span></article>
+                <article class="speaker-card"><span class="speaker-mark" aria-hidden="true">백</span><strong>백승재</strong><span>UNIST 의과학대학원장 · MD, PhD</span></article>
+                <article class="speaker-card"><span class="speaker-mark" aria-hidden="true">김</span><strong>김윤명</strong><span>前 에어스메디컬 공동창업자 · MD, MSc</span></article>
+              </div>
+            </div>
+          </article>
+          <article class="program-row">
+            <div class="program-time">20:10</div>
+            <div class="program-content"><span class="part">PART 04</span><h3>네트워킹</h3></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="apply-band" aria-label="행사 신청 안내">
+      <div class="apply-inner wrap">
+        <div><h2>Korean Young Physician Scientists Night 2026</h2><p>10명 내외 · 지원서 검토 후 선정 · 무료 · 석식 제공</p></div>
+        <a class="btn btn-light" href="https://forms.gle/jDQPL4hDZDeXTXLS8" target="_blank" rel="noopener">11월 20일까지 신청 <span class="arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section class="section activities" id="activities">
+      <div class="wrap">
+        <div class="section-head">
+          <div><p class="eyebrow">What We Do</p><h2>함께 성장하는<br>다섯 가지 방법</h2></div>
+          <p>정책과 연구, 창업과 커리어를 연결해 젊은 의사과학자의 성장을 실질적으로 돕습니다.</p>
+        </div>
+        <div class="activity-grid">
+          <article class="activity-card"><span class="activity-no">01 · POLICY</span><h3>정책 소통 창구</h3><p>차세대 의사과학자 양성을 위한 정책·제도 의견을 정부와 유관기관에 전달합니다.</p></article>
+          <article class="activity-card"><span class="activity-no">02 · VENTURE</span><h3>창업 인큐베이팅 캠프</h3><p>디지털 헬스케어 분야의 소규모 프로젝트와 창업 준비를 지원합니다.</p></article>
+          <article class="activity-card"><span class="activity-no">03 · TRAINING</span><h3>역량 훈련 베이스캠프</h3><p>연구 설계, 논문 작성, 연구비 지원서, 리더십 교육을 운영합니다.</p></article>
+          <article class="activity-card"><span class="activity-no">04 · COLLABORATION</span><h3>공동연구 매칭</h3><p>임상·공학·데이터사이언스 분야 회원 간 공동연구를 연결합니다.</p></article>
+          <article class="activity-card"><span class="activity-no">05 · CAREER</span><h3>커리어 리포트</h3><p>국내 MD-PhD 진로 데이터를 모아 연간 리포트로 발간합니다.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section membership" id="members">
+      <div class="wrap">
+        <div class="section-head">
+          <div><p class="eyebrow">Membership</p><h2>의사과학자의<br>다음 동료</h2></div>
+          <p>훈련 중인 의사과학자부터 의학과 기술의 접점에 관심 있는 다양한 구성원이 함께합니다.</p>
+        </div>
+        <div class="member-grid">
+          <article class="member-card"><p class="eyebrow">Regular Member</p><h3>정회원 · 훈련 중인 의사과학자</h3><p>40세 이하 의사(M.D.)로서 이학 또는 공학 분야 석사·박사 과정생이거나 학위 소지자.</p></article>
+          <article class="member-card"><p class="eyebrow">Associate Member</p><h3>준회원 · 관련 분야 관심자</h3><p>의대생, 창업에 관심 있는 의사, 디지털 헬스케어 분야 종사자.</p></article>
+          <article class="badge-card">
+            <img src="../assets/badge-2026.png" alt="FOUNDING MEMBER 2026 창립 멤버 배지">
+            <div><p class="eyebrow">Founding Member · 2026</p><h3>처음의 뜻을 오래 남기는 배지</h3><p>창립 멤버에게 드리는 배지로, 12월 5일 행사에서 전달합니다.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section founders" id="founders">
+      <div class="wrap">
+        <div class="section-head">
+          <div><p class="eyebrow">Co-Founders</p><h2>연결을 시작한<br>두 사람</h2></div>
+          <p>임상과 공학, 연구와 창업의 경계를 오가며 젊은 의사과학자의 새로운 네트워크를 시작합니다.</p>
+        </div>
+        <div class="founder-grid">
+          <article class="founder-card">
+            <div class="founder-identity"><span class="founder-mark" aria-hidden="true">이</span><div><span class="role">대표 · PRESIDENT</span><h3>이진규</h3></div></div>
+            <ul><li>포항공대 화학공학과 학사</li><li>경북대병원 전공의</li><li>서울대학교 바이오엔지니어링 박사과정</li><li>웨어러블 디바이스 · 피지컬 AI 연구</li><li>비영리 임의단체 人Star 대표</li><li>2020 대한민국 인재상</li></ul>
+          </article>
+          <article class="founder-card">
+            <div class="founder-identity"><span class="founder-mark" aria-hidden="true">김</span><div><span class="role">부대표 · CO-FOUNDER</span><h3>김경훈</h3></div></div>
+            <ul><li>서울아산병원 피부과 전공의</li><li>서울대학교 바이오엔지니어링 박사과정</li><li>피부 AI 스타트업 더마트릭스 대표</li><li>To be doctor 창립자 및 전 대표</li><li>2025 대한민국 인재상</li><li>도전! K-스타트업 2025 왕중왕전 최우수상</li></ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sponsor" aria-label="후원">
+      <div class="wrap"><p class="eyebrow">Sponsored by</p><p class="sponsor-name">블루포인트파트너스</p><p>Korean Young Physician Scientists Night 2026은 블루포인트파트너스가 후원합니다.</p></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-main">
+        <div><img class="footer-logo" src="../assets/logo-horizontal.png" alt="KYPSN"><p class="footer-tagline">젊은 의사과학자의 성장 러닝메이트</p></div>
+        <div class="footer-contact"><span>CONTACT</span><a href="mailto:office@kypsn.org">office@kypsn.org</a></div>
+      </div>
+      <div class="footer-bottom">Korean Young Physician-Scientist Network · 한국젊은의사과학자네트워크</div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.menu-toggle');
+    const links = document.querySelector('#nav-links');
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      toggle.setAttribute('aria-label', open ? '메뉴 열기' : '메뉴 닫기');
+      links.classList.toggle('is-open', !open);
+    });
+    links.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', '메뉴 열기');
+      links.classList.remove('is-open');
+    }));
+  </script>
+</body>
+</html>
