@@ -249,7 +249,7 @@ img { display: block; max-width: 100%; }
 .founder li.hl::before { background: var(--gold); }
 
 /* 연락처 */
-.contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.contact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .c-card { padding: 34px; border-radius: 20px; border: 1px solid var(--line); background: var(--white); }
 .c-card b { display: block; color: var(--warm); font-size: 12px; font-weight: 700; letter-spacing: .14em; }
 .c-card .v { display: block; margin-top: 12px; font-size: 19px; font-weight: 700; letter-spacing: -.01em; line-height: 1.5; }
