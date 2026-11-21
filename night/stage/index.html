@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>KYPSN Pixel Hotel · 무대 화면</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --gold:#E2B857; --ink:#F3EEDF; --navy:#0E1630; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #05070F; color: var(--ink); font-family: "Noto Sans KR", system-ui, sans-serif; overflow: hidden; }
+  .px { font-family: "Press Start 2P", monospace; }
+  .stage-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .world { position: relative; width: min(100vw, 177.78vh); aspect-ratio: 16 / 9; container-type: inline-size; overflow: hidden; background: #1E2238; }
+  .world > canvas.bg { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .abs { position: absolute; }
+  .table { image-rendering: pixelated; pointer-events: none; }
+
+  /* 엘리베이터 */
+  .elev { overflow: hidden; background: radial-gradient(ellipse at 50% 20%, #FFF2C4 0, #C9A85A 50%, #4A3A1E 100%); }
+  .elev .d { position: absolute; top: 0; bottom: 0; width: 50%; background: linear-gradient(90deg, #7E879B, #C4CBD9 50%, #7E879B); transition: transform .5s ease-in-out; }
+  .elev .d.l { left: 0; border-right: 1px solid #555D70; } .elev .d.r { right: 0; border-left: 1px solid #555D70; }
+  .elev.open .d.l { transform: translateX(-100%); } .elev.open .d.r { transform: translateX(100%); }
+  .sign14 { display: flex; align-items: center; justify-content: center; background: #120808; color: #FF8A3D; font-size: .95cqw; text-shadow: 0 0 .5cqw #FF6A1A; border: .15cqw solid #3A2A2A; }
+  .sign14 .arr { color: #FF8A3D; margin-right: .3cqw; opacity: .3; } .sign14.on .arr { opacity: 1; }
+
+  /* LED 화면 */
+  .led { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #EAF0FF; gap: .5cqw; }
+  .led .t1 { font-size: 1.6cqw; color: var(--gold); text-shadow: 0 0 .6cqw rgba(226,184,87,.6); }
+  .led .t2 { font-size: .95cqw; color: #BFD0FF; font-weight: 700; letter-spacing: .02em; }
+  .led .t3 { font-size: 1.05cqw; font-weight: 900; }
+  .welcome-board { display: flex; align-items: center; justify-content: center; text-align: center; color: #3A2A12; font-size: .55cqw; line-height: 1.3; font-weight: 900; }
+
+  /* 캐릭터 */
+  .agent { position: absolute; cursor: pointer; }
+  .agent canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+  .agent .nm { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); white-space: nowrap; font-size: .78cqw; font-weight: 700; background: rgba(8,12,28,.78); color: #fff; padding: .05cqw .35cqw; border-radius: .25cqw; margin-bottom: .1cqw; pointer-events: none; }
+  .agent.done .nm::before { content: "★ "; color: var(--gold); }
+  .agent.flip canvas { transform: scaleX(-1); }
+  .agent.pop { animation: pop .7s cubic-bezier(.3,1.8,.5,1); }
+  @keyframes pop { 0% { transform: scale(0); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  .agent.sel { animation: hop .6s ease-in-out infinite alternate; z-index: 950 !important; }
+  @keyframes hop { from { transform: translateY(0); } to { transform: translateY(-18%); } }
+  .agent:hover .nm { background: var(--gold); color: #1A1406; }
+  .bubble { position: absolute; left: 60%; bottom: 128%; background: #fff; color: #1A1406; font-weight: 900; font-size: .9cqw; padding: .1cqw .45cqw; border-radius: .6cqw; pointer-events: none; animation: bob 1s ease-in-out infinite alternate; }
+  .bubble::after { content: ""; position: absolute; left: 20%; top: 100%; border: .3cqw solid transparent; border-top-color: #fff; }
+  @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-25%); } }
+  .boom { position: absolute; pointer-events: none; font-weight: 900; color: #fff; font-size: 1.4cqw; text-shadow: 0 0 .5cqw #FFB84D, 0 .15cqw 0 #8C5A1C; animation: boom 1.2s ease-out forwards; z-index: 990; }
+  @keyframes boom { 0% { transform: scale(.2); opacity: 0; } 25% { transform: scale(1.3); opacity: 1; } 100% { transform: translateY(-120%) scale(1); opacity: 0; } }
+  .spark { position: absolute; width: .4cqw; height: .4cqw; background: #FFE08A; pointer-events: none; animation: spark .8s ease-out forwards; z-index: 989; }
+  @keyframes spark { to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+
+  /* 스포트라이트 */
+  .spot { position: absolute; border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 200cqw rgba(0,0,0,.55); z-index: 940; transition: all .4s; background: radial-gradient(circle, rgba(255,240,190,.25), rgba(255,240,190,0) 70%); }
+
+  /* 소개·질문 카드 */
+  .card { position: absolute; right: 2.5cqw; top: 50%; transform: translateY(-50%); width: 40cqw; background: rgba(14,22,48,.96); border: .25cqw solid var(--gold); border-radius: .8cqw; padding: 2cqw; z-index: 1000; box-shadow: 0 1cqw 0 rgba(0,0,0,.4); }
+  .card.left { right: auto; left: 2.5cqw; }
+  .card .top { display: flex; gap: 1.6cqw; align-items: center; }
+  .card canvas { width: 8cqw; height: 10cqw; image-rendering: pixelated; background: #0B1228; border-radius: .4cqw; }
+  .card .lab { font-size: .8cqw; color: var(--gold); }
+  .card .nm { font-size: 3cqw; font-weight: 900; margin: .4cqw 0; }
+  .card .rl { font-size: 1.5cqw; color: #C9D3F0; line-height: 1.35; }
+  .card .row { margin-top: 1.4cqw; border-top: .1cqw solid #2C3866; padding-top: 1cqw; }
+  .card .row .k { font-size: 1cqw; color: var(--gold); font-weight: 700; }
+  .card .row .v { font-size: 1.6cqw; font-weight: 700; line-height: 1.4; margin-top: .3cqw; }
+  .card .two { display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.4cqw; }
+  .card .chips { display: flex; flex-wrap: wrap; gap: .4cqw; margin-top: .6cqw; }
+  .card .chip { font-size: 1.05cqw; font-weight: 700; padding: .2cqw .7cqw; border-radius: 1cqw; background: #22305E; color: #DCE4FF; }
+  .card .chip.fut { background: #3A2A12; color: var(--gold); }
+  .card .mb { display: inline-block; margin-left: .6cqw; padding: .25cqw .5cqw; background: var(--gold); color: #1A1406; border-radius: .3cqw; }
+  .card .q { font-size: 2.4cqw; font-weight: 900; line-height: 1.4; margin-top: 1.2cqw; }
+  .card .btns { display: flex; gap: .8cqw; margin-top: 1.6cqw; }
+  .card .btns button { flex: 1; font: inherit; font-size: 1.1cqw; font-weight: 900; padding: .8cqw; border-radius: .4cqw; border: .15cqw solid #2C3866; background: #0B1228; color: var(--ink); cursor: pointer; }
+  .card .btns button.pri { background: var(--gold); color: #1A1406; border-color: var(--gold); }
+
+  .qlist { position: absolute; left: 1.2cqw; top: 1.2cqw; bottom: 5.4cqw; width: 26cqw; background: rgba(8,12,28,.9); border: .15cqw solid #2C3866; border-radius: .6cqw; padding: 1cqw; z-index: 960; overflow-y: auto; }
+  .qlist h3 { margin: 0 0 .6cqw; font-size: 1.2cqw; color: var(--gold); }
+  .qitem { display: flex; gap: .7cqw; padding: .7cqw .4cqw; border-top: .1cqw solid #2C3866; cursor: pointer; align-items: flex-start; }
+  .qitem:hover { background: #17224A; }
+  .qitem canvas { width: 2.2cqw; height: 2.75cqw; image-rendering: pixelated; flex: none; }
+  .qitem .tx { font-size: 1.05cqw; line-height: 1.4; }
+  .qitem .tg { font-size: .8cqw; color: var(--gold); font-weight: 700; }
+  .qitem.done { opacity: .4; }
+
+  /* 토스트·조작 */
+  .toast { position: absolute; left: 50%; top: 1.4cqw; transform: translateX(-50%); background: rgba(14,22,48,.92); border: .15cqw solid var(--gold); color: #fff; font-weight: 900; font-size: 1.25cqw; padding: .6cqw 1.4cqw; border-radius: 2cqw; z-index: 1001; transition: opacity .3s; opacity: 0; pointer-events: none; white-space: nowrap; }
+  .toast.on { opacity: 1; }
+  .bar { position: absolute; left: 50%; bottom: 1.2cqw; transform: translateX(-50%); display: flex; gap: .5cqw; align-items: center; background: rgba(8,12,28,.88); border: .12cqw solid #2C3866; border-radius: 3cqw; padding: .45cqw .6cqw; z-index: 1100; opacity: .25; transition: opacity .3s; }
+  .bar:hover, .bar.show { opacity: 1; }
+  .bar button { white-space: nowrap; font: inherit; font-size: .95cqw; font-weight: 700; color: var(--ink); background: transparent; border: .12cqw solid transparent; border-radius: 2cqw; padding: .35cqw .9cqw; cursor: pointer; }
+  .bar button.on { border-color: var(--gold); color: var(--gold); }
+  .bar .st { font-size: .85cqw; color: #9AA6CC; padding: 0 .6cqw; white-space: nowrap; }
+  .badge { font-size: .65cqw; padding: .15cqw .5cqw; border-radius: .3cqw; background: #3A2A12; color: var(--gold); }
+  .qr { position: absolute; inset: 0; background: rgba(5,7,15,.88); z-index: 1050; display: flex; align-items: center; justify-content: center; gap: 4cqw; }
+  .qr .box { background: #fff; padding: 1.6cqw; border-radius: 1cqw; }
+  .qr .box img, .qr .box canvas { width: 24cqw !important; height: 24cqw !important; image-rendering: pixelated; display: block; }
+  .qr .tx .px { color: var(--gold); font-size: 1.4cqw; }
+  .qr .tx h2 { font-size: 3.6cqw; margin: 1.2cqw 0 .6cqw; font-weight: 900; }
+  .qr .tx p { font-size: 1.8cqw; color: #C9D3F0; margin: 0; line-height: 1.5; }
+  .qr .tx .url { font-size: 2.2cqw; color: #fff; font-weight: 900; margin-top: 1.4cqw; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="stage-wrap"><div class="world" id="world">
+  <canvas class="bg" id="bg" width="384" height="216"></canvas>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="../config.js"></script>
+<script src="../night.js"></script>
+<script>
+(function () {
+  const K = window.KNight, CFG = K.CFG;
+  const W = 384, H = 216;
+  const params = new URLSearchParams(location.search);
+  const DEMO = params.has("demo");
+  const world = document.getElementById("world");
+  const pct = (v, total) => (v / total * 100) + "%";
+  function place(el, x, y, w, h) { el.style.left = pct(x, W); el.style.top = pct(y, H); el.style.width = pct(w, W); el.style.height = pct(h, H); }
+  function mk(tag, cls, parent) { const e = document.createElement(tag); if (cls) e.className = cls; (parent || world).appendChild(e); return e; }
+
+  // ── 배경: 명동 14층 호텔 행사장 ──────────────────────────
+  const bg = document.getElementById("bg"), bx = bg.getContext("2d");
+  const R0 = K.rng(1205);
+  const winLights = [];
+  function skyline(x0, x1) {
+    const g = bx.createLinearGradient(0, 6, 0, 60); g.addColorStop(0, "#070C26"); g.addColorStop(1, "#28356A");
+    bx.fillStyle = g; bx.fillRect(x0, 6, x1 - x0, 54);
+    for (let i = 0; i < (x1 - x0) / 6; i++) { bx.fillStyle = "#5A6698"; bx.fillRect(x0 + Math.floor(R0() * (x1 - x0)), 7 + Math.floor(R0() * 20), 1, 1); }
+    for (let x = x0; x < x1; ) {
+      const w = 6 + Math.floor(R0() * 10), h = 12 + Math.floor(R0() * 30);
+      bx.fillStyle = R0() < .5 ? "#10172E" : "#151D3A"; bx.fillRect(x, 60 - h, Math.min(w, x1 - x), h);
+      for (let wy = 62 - h; wy < 58; wy += 3) for (let wx = x + 1; wx < Math.min(x + w - 1, x1); wx += 2) if (R0() < .3) winLights.push([wx, wy, R0() < .8 ? "#F5D77A" : "#9CC7FF"]);
+      x += w + 1;
+    }
+  }
+  function drawStatic() {
+    bx.fillStyle = "#1E2238"; bx.fillRect(0, 0, W, 70);
+    skyline(4, 108); skyline(278, 326);
+    // 남산타워
+    bx.fillStyle = "#222B52"; bx.fillRect(43, 24, 3, 36); bx.fillRect(40, 20, 9, 5); bx.fillRect(44, 10, 1, 10);
+    // 창틀
+    bx.fillStyle = "#3B4466";
+    for (let x = 4; x <= 108; x += 26) bx.fillRect(x, 6, 1, 54);
+    for (let x = 278; x <= 326; x += 24) bx.fillRect(x, 6, 1, 54);
+    bx.fillStyle = "#4A5274"; bx.fillRect(2, 59, 108, 3); bx.fillRect(276, 59, 52, 3);
+    // 천장 + 조명
+    bx.fillStyle = "#12152A"; bx.fillRect(0, 0, W, 6);
+    for (let x = 16; x < W; x += 32) { bx.fillStyle = "#FFF3C4"; bx.fillRect(x, 4, 4, 1); }
+    // 무대 뒷벽 (원목 슬랫)
+    bx.fillStyle = "#2A1F1A"; bx.fillRect(110, 6, 166, 56);
+    for (let x = 112; x < 276; x += 4) { bx.fillStyle = "#3A2A20"; bx.fillRect(x, 6, 2, 56); }
+    // LED 화면
+    bx.fillStyle = "#07070D"; bx.fillRect(126, 8, 134, 42);
+    const lg = bx.createLinearGradient(0, 10, 0, 48); lg.addColorStop(0, "#0E2350"); lg.addColorStop(1, "#173A80");
+    bx.fillStyle = lg; bx.fillRect(128, 10, 130, 38);
+    // 무대 조명
+    [134, 160, 226, 252].forEach((x, i) => { bx.fillStyle = "#333"; bx.fillRect(x, 6, 4, 2); bx.fillStyle = ["#E2B857", "#7FB2FF", "#7FB2FF", "#E2B857"][i]; bx.fillRect(x + 1, 8, 2, 1); });
+    // 엘리베이터 벽 (대리석)
+    bx.fillStyle = "#2C3150"; bx.fillRect(328, 6, 56, 64);
+    for (let i = 0; i < 40; i++) { bx.fillStyle = "#363C5E"; bx.fillRect(328 + Math.floor(R0() * 56), 6 + Math.floor(R0() * 60), 3, 1); }
+    bx.fillStyle = "#C8A45A"; bx.fillRect(335, 21, 34, 2); bx.fillRect(335, 21, 2, 43); bx.fillRect(367, 21, 2, 43);
+    bx.fillStyle = "#151A30"; bx.fillRect(371, 40, 4, 6); bx.fillStyle = "#FF8A3D"; bx.fillRect(372, 42, 2, 2);
+    // 무대
+    bx.fillStyle = "#7A5333"; bx.fillRect(110, 58, 166, 10);
+    for (let x = 110; x < 276; x += 12) { bx.fillStyle = "#6A4529"; bx.fillRect(x, 58, 1, 10); }
+    bx.fillStyle = "#4A3020"; bx.fillRect(110, 68, 166, 6);
+    bx.fillStyle = "#E2B857"; bx.fillRect(110, 67, 166, 1);
+    // 패널 의자 + 연단
+    [150, 172, 194, 216].forEach(x => { bx.fillStyle = "#23233A"; bx.fillRect(x, 52, 8, 7); bx.fillStyle = "#383858"; bx.fillRect(x, 58, 8, 2); bx.fillStyle = "#1A1A28"; bx.fillRect(x + 1, 60, 1, 4); bx.fillRect(x + 6, 60, 1, 4); });
+    bx.fillStyle = "#5B3B24"; bx.fillRect(240, 46, 14, 20); bx.fillStyle = "#6E4B30"; bx.fillRect(238, 44, 18, 3); bx.fillStyle = "#E2B857"; bx.fillRect(245, 52, 4, 4);
+    // 바닥 카펫
+    bx.fillStyle = "#3B1C34"; bx.fillRect(0, 70, W, H - 70);
+    bx.fillStyle = "#2A1226"; bx.fillRect(0, 70, W, 3);
+    for (let y = 78; y < H; y += 12) for (let x = (y / 12 % 2) * 6; x < W; x += 12) {
+      bx.fillStyle = "#57304A"; bx.fillRect(x + 5, y, 2, 1); bx.fillRect(x + 4, y + 1, 4, 1); bx.fillRect(x + 5, y + 2, 2, 1);
+      bx.fillStyle = "#7A5A3A"; bx.fillRect(x + 5, y + 1, 2, 1);
+    }
+    // 엘리베이터 앞 통로 (러너 카펫)
+    bx.fillStyle = "#1F2A52"; bx.fillRect(340, 70, 24, H - 70);
+    bx.fillStyle = "#C8A45A"; bx.fillRect(340, 70, 1, H - 70); bx.fillRect(363, 70, 1, H - 70);
+    // 화분
+    [[6, 182], [370, 64], [314, 62]].forEach(([x, y]) => { bx.fillStyle = "#2E5E3A"; bx.fillRect(x - 3, y - 12, 8, 8); bx.fillRect(x - 1, y - 16, 4, 4); bx.fillStyle = "#3F7D4C"; bx.fillRect(x, y - 14, 2, 8); bx.fillStyle = "#8C6A44"; bx.fillRect(x - 2, y - 4, 6, 6); });
+    // 웰컴 보드 받침
+    bx.fillStyle = "#3A2A1A"; bx.fillRect(318, 94, 1, 12); bx.fillRect(328, 94, 1, 12);
+    bx.fillStyle = "#F0E6D0"; bx.fillRect(314, 78, 18, 16); bx.fillStyle = "#C8A45A"; bx.fillRect(314, 78, 18, 1); bx.fillRect(314, 93, 18, 1);
+  }
+  let staticImg = null;
+  function drawBG(t) {
+    if (!staticImg) { drawStatic(); staticImg = bx.getImageData(0, 0, W, H); }
+    bx.putImageData(staticImg, 0, 0);
+    winLights.forEach(([x, y, c], i) => { if ((i * 7 + Math.floor(t / 900)) % 23 !== 0) { bx.fillStyle = c; bx.fillRect(x, y, 1, 1); } });
+    bx.fillStyle = Math.floor(t / 700) % 2 ? "#FF4A4A" : "#5A1A1A"; bx.fillRect(44, 9, 1, 1);
+  }
+
+  // ── 고정 오브젝트 (DOM) ─────────────────────────────────
+  const led = mk("div", "abs led"); place(led, 128, 10, 130, 38);
+  led.innerHTML = '<div class="t1 px">KYPSN NIGHT 2026</div><div class="t2">From Clinic to Market, Through the Bench</div><div class="t3" id="ledMsg"></div>';
+  const sign = mk("div", "abs sign14 px"); place(sign, 341, 11, 22, 8); sign.innerHTML = '<span class="arr">▲</span>14F';
+  const elev = mk("div", "abs elev"); place(elev, 337, 23, 30, 41); elev.innerHTML = '<div class="d l"></div><div class="d r"></div>';
+  const board = mk("div", "abs welcome-board"); place(board, 314, 79, 18, 14); board.innerHTML = "WELCOME<br>KYPSN";
+
+  // 원탁 6개 (좌석 6개씩)
+  const TABLES = [[62, 112], [152, 112], [242, 112], [62, 170], [152, 170], [242, 170]];
+  TABLES.forEach(([cx, cy]) => {
+    const c = mk("canvas", "abs table"); c.width = 48; c.height = 20; place(c, cx - 24, cy - 8, 48, 20); c.style.zIndex = 100 + cy + 8;
+    const x = c.getContext("2d");
+    x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.ellipse(24, 13, 23, 7, 0, 0, 7); x.fill();
+    x.fillStyle = "#D9D2C2"; x.beginPath(); x.ellipse(24, 10, 22, 7, 0, 0, 7); x.fill();
+    x.fillStyle = "#C9C0AE"; x.fillRect(2, 10, 44, 4); x.beginPath(); x.ellipse(24, 14, 22, 5, 0, 0, Math.PI); x.fill();
+    x.fillStyle = "#F2EDE2"; x.beginPath(); x.ellipse(24, 9, 21, 6, 0, 0, 7); x.fill();
+    x.fillStyle = "#E2B857"; x.fillRect(23, 6, 2, 3); x.fillStyle = "#FFF3C4"; x.fillRect(23, 5, 2, 1);
+    [[12, 9], [34, 9], [24, 12]].forEach(([gx, gy]) => { x.fillStyle = "#BFD6F0"; x.fillRect(gx, gy, 1, 2); });
+  });
+  // 좌석: 뒤줄(탁자 뒤) 3 + 앞줄 3, 탁자 사이로 고르게 채움
+  const SLOT = [[0, -1], [0, 1], [-1, -1], [1, 1], [1, -1], [-1, 1]];
+  const SEATS = [];
+  SLOT.forEach(([dx, side]) => TABLES.forEach(([cx, cy]) => SEATS.push({ x: cx + dx * 15, y: side < 0 ? cy + 3 : cy + 27, side })));
+  for (let row = 0; row < 5; row++) for (let col = 0; col < 2; col++) SEATS.push({ x: 296 + col * 18, y: 120 + row * 20, side: 1, stand: true });
+  const AISLES = [84, 141, 205];
+  const DOOR = { x: 352, y: 64 };
+
+  // ── 상태 ────────────────────────────────────────────────
+  const STK = "kypsn-night-stage";
+  const mod = (() => { try { return JSON.parse(localStorage.getItem(STK)) || {}; } catch (e) { return {}; } })();
+  mod.hidden = mod.hidden || {}; mod.done = mod.done || {}; mod.qdone = mod.qdone || {};
+  const saveMod = () => { try { localStorage.setItem(STK, JSON.stringify(mod)); } catch (e) {} };
+  const FIELDS = ["role", "pos", "interest", "future", "mbti", "question", "meet", "ifnot"];
+  const people = new Map();   // cid → person
+  const asks = new Map();     // key → ask
+  let seatN = 0, first = true, mode = "intro", selected = null;
+  const queue = [];
+
+  function seatFor() { const s = SEATS[seatN] || { x: 20 + Math.random() * 280, y: 196 + Math.random() * 12, side: 1, stand: true }; seatN++; return s; }
+
+  function makeAgent(p) {
+    const el = mk("div", "agent"); const c = mk("canvas", "", el); c.width = 16; c.height = 20;
+    const nm = mk("div", "nm", el); nm.textContent = p.name;
+    el.onclick = ev => { ev.stopPropagation(); select(p); };
+    p.el = el; p.cv = c; p.frame = 0; paintAgent(p);
+    return el;
+  }
+  function paintAgent(p) { const x = p.cv.getContext("2d"); x.clearRect(0, 0, 16, 20); K.paint(x, p.name, 0, 0, 1, p.frame, K.look(p.pos)); }
+  function setPos(p, x, y) { p.x = x; p.y = y; place(p.el, x - 8, y - 20, 16, 20); p.el.style.zIndex = 100 + Math.round(y); }
+
+  function addPerson(e, animate) {
+    const p = { cid: e.cid, name: e.name || "손님", ts: e.ts }; FIELDS.forEach(k => p[k] = e[k] || "");
+    people.set(p.cid, p); p.seat = seatFor(); makeAgent(p);
+    if (mod.done[p.cid]) p.el.classList.add("done");
+    if (mod.hidden[p.cid]) p.el.classList.add("hidden");
+    if (animate) { p.el.style.visibility = "hidden"; setPos(p, DOOR.x, DOOR.y); queue.push(p); }
+    else setPos(p, p.seat.x, p.seat.y);
+  }
+
+  // ── 입장 연출: 엘리베이터 → 뿅 → 걸어서 자리로 ───────────
+  let busy = false;
+  function runQueue() {
+    if (busy || !queue.length) return; busy = true;
+    const p = queue.shift();
+    sign.classList.add("on"); elev.classList.add("open");
+    setTimeout(() => {
+      p.el.style.visibility = ""; p.el.classList.add("pop"); boom(p.x, p.y - 22);
+      toast("🛎 " + p.name + " 님 체크인 · 14F On Air Stage");
+      updateLed();
+    }, 450);
+    setTimeout(() => {
+      p.el.classList.remove("pop");
+      const s = p.seat, aisle = s.stand ? 120 : (s.side < 0 ? AISLES[AISLES.findIndex(a => a > s.y) - 1] : AISLES.find(a => a > s.y));
+      p.path = [[DOOR.x, aisle], [s.x, aisle], [s.x, s.y]]; walkers.add(p);
+    }, 1300);
+    setTimeout(() => { elev.classList.remove("open"); sign.classList.remove("on"); }, 1700);
+    setTimeout(() => { busy = false; runQueue(); }, 2000);
+  }
+  function boom(x, y) {
+    const b = mk("div", "boom"); b.textContent = "뿅!"; b.style.left = pct(x - 6, W); b.style.top = pct(y - 6, H); setTimeout(() => b.remove(), 1300);
+    for (let i = 0; i < 10; i++) { const s = mk("div", "spark"); s.style.left = pct(x, W); s.style.top = pct(y + 8, H); const a = i / 10 * 6.28;
+      s.style.setProperty("--dx", Math.cos(a) * 4 + "cqw"); s.style.setProperty("--dy", Math.sin(a) * 4 + "cqw"); setTimeout(() => s.remove(), 900); }
+  }
+  const walkers = new Set(); let lastT = 0;
+  function step(t) {
+    const dt = Math.min(.05, (t - lastT) / 1000); lastT = t;
+    walkers.forEach(p => {
+      const [tx, ty] = p.path[0]; const dx = tx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy), v = 75 * dt;
+      if (d <= v) { setPos(p, tx, ty); p.path.shift(); if (!p.path.length) { walkers.delete(p); p.frame = 0; paintAgent(p); p.el.classList.remove("flip"); return; } }
+      else setPos(p, p.x + dx / d * v, p.y + dy / d * v);
+      p.el.classList.toggle("flip", dx < -0.5);
+      const f = 1 + Math.floor(t / 140) % 2; if (f !== p.frame) { p.frame = f; paintAgent(p); }
+    });
+    drawBG(t);
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+
+  // ── 질문 ────────────────────────────────────────────────
+  function addAsk(e) {
+    const key = e.cid + "|" + e.ts + "|" + e.ask; if (asks.has(key)) return false;
+    asks.set(key, { key, cid: e.cid, name: e.name, target: e.target || "패널 전체", ask: e.ask, ts: e.ts }); return true;
+  }
+  const qlist = mk("div", "qlist hidden");
+  function renderQuestions() {
+    const list = [...asks.values()].filter(a => !mod.hidden[a.cid]).sort((a, b) => (mod.qdone[a.key] ? 1 : 0) - (mod.qdone[b.key] ? 1 : 0) || String(b.ts).localeCompare(String(a.ts)));
+    qlist.innerHTML = "<h3>질문 " + list.length + "개 · 눌러서 크게 보기</h3>";
+    list.forEach(a => {
+      const it = mk("div", "qitem" + (mod.qdone[a.key] ? " done" : ""), qlist); const c = mk("canvas", "", it); K.draw(c, a.name, 2);
+      const tx = mk("div", "", it); tx.innerHTML = '<div class="tg"></div><div class="tx"></div>'; tx.firstChild.textContent = a.name + " → " + a.target; tx.lastChild.textContent = a.ask;
+      it.onclick = () => showAsk(a);
+    });
+    people.forEach(p => {
+      const has = list.some(a => a.cid === p.cid && !mod.qdone[a.key]);
+      let b = p.el.querySelector(".bubble");
+      if (mode === "qa" && has) { if (!b) { b = mk("div", "bubble", p.el); b.textContent = "?"; } } else if (b) b.remove();
+    });
+  }
+
+  // ── 카드·선택 ───────────────────────────────────────────
+  const spot = mk("div", "spot hidden"), card = mk("div", "card hidden");
+  function clearSel() { if (selected) selected.el.classList.remove("sel"); selected = null; spot.classList.add("hidden"); card.classList.add("hidden"); }
+  function spotOn(p) { card.classList.toggle("left", p.x > W / 2); place(spot, p.x - 22, p.y - 34, 44, 44); spot.classList.remove("hidden"); p.el.classList.add("sel"); selected = p; }
+  function select(p) {
+    if (mode === "qa") { const a = [...asks.values()].find(a => a.cid === p.cid && !mod.qdone[a.key]); if (a) return showAsk(a); }
+    clearSel(); spotOn(p);
+    const esc = s => String(s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    const chips = s => String(s || "").split(", ").filter(Boolean).map(v => '<span class="chip">' + esc(v) + "</span>").join("");
+    const row = (k, v, cls) => v ? '<div class="row' + (cls ? " " + cls : "") + '"><div class="k">' + k + '</div><div class="v">' + esc(v) + "</div></div>" : "";
+    card.innerHTML = '<div class="top"><canvas></canvas><div><div class="lab px">GUEST · 14F' + (p.mbti && p.mbti !== "몰라요" ? ' <span class="mb">' + esc(p.mbti) + "</span>" : "") + '</div><div class="nm">' + esc(p.name) + '</div><div class="rl">' + esc(p.role) + '</div><div class="chips">' + chips(p.pos) + (p.future ? '<span class="chip fut">10년 뒤 ' + esc(p.future) + "</span>" : "") + "</div></div></div>" +
+      (p.interest ? '<div class="row"><div class="k">관심 분야</div><div class="chips">' + chips(p.interest) + "</div></div>" : "") +
+      row("요즘 진로 고민", p.question) +
+      '<div class="two">' + row("오늘 만나고 싶은 사람", p.meet) + row("의사가 안 됐다면", p.ifnot) + "</div>" +
+      '<div class="btns"><button class="pri" data-a="done">소개 끝 ★ (Enter)</button><button data-a="close">닫기 (Esc)</button><button data-a="hide">화면에서 숨기기</button></div>';
+    K.draw(card.querySelector("canvas"), p.name, 8, 0, K.look(p.pos));
+    card.querySelector('[data-a=done]').onclick = () => { mod.done[p.cid] = 1; saveMod(); p.el.classList.add("done"); clearSel(); updateLed(); };
+    card.querySelector('[data-a=close]').onclick = clearSel;
+    card.querySelector('[data-a=hide]').onclick = () => { mod.hidden[p.cid] = 1; saveMod(); p.el.classList.add("hidden"); clearSel(); updateLed(); };
+    card.classList.remove("hidden");
+  }
+  function showAsk(a) {
+    clearSel(); const p = people.get(a.cid); if (p) spotOn(p);
+    card.innerHTML = '<div class="top"><canvas></canvas><div><div class="lab px">QUESTION</div><div class="nm"></div><div class="rl"></div></div></div><div class="q"></div>' +
+      '<div class="btns"><button class="pri" data-a="done">답변 끝 (Enter)</button><button data-a="close">닫기 (Esc)</button></div>';
+    K.draw(card.querySelector("canvas"), a.name, 8);
+    card.querySelector(".nm").textContent = a.name; card.querySelector(".rl").textContent = "→ " + a.target; card.querySelector(".q").textContent = a.ask;
+    card.querySelector('[data-a=done]').onclick = () => { mod.qdone[a.key] = 1; saveMod(); clearSel(); renderQuestions(); updateLed(); };
+    card.querySelector('[data-a=close]').onclick = clearSel;
+    card.classList.remove("hidden");
+  }
+  world.addEventListener("click", e => { if (e.target === world || e.target.id === "bg") clearSel(); });
+
+  function randomPick() {
+    const pool = [...people.values()].filter(p => !mod.done[p.cid] && !mod.hidden[p.cid] && !walkers.has(p) && p.el.style.visibility !== "hidden");
+    if (!pool.length) return toast("소개할 사람이 더 없어요");
+    let i = 0; const n = 12 + Math.floor(Math.random() * 6);
+    const tick = () => { clearSel(); const p = pool[Math.floor(Math.random() * pool.length)]; if (++i < n) { spotOn(p); setTimeout(tick, 70 + i * 12); } else select(p); };
+    tick();
+  }
+
+  // ── LED·토스트·조작 바 ───────────────────────────────────
+  const tst = mk("div", "toast"); let tt;
+  function toast(s) { tst.textContent = s; tst.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => tst.classList.remove("on"), 2600); }
+  function visibleCount() { return [...people.values()].filter(p => !mod.hidden[p.cid]).length; }
+  let ledI = 0; setInterval(() => { ledI++; updateLed(); }, 5000);
+  function updateLed() {
+    const m = document.getElementById("ledMsg");
+    if (mode === "qa") { const open = [...asks.values()].filter(a => !mod.qdone[a.key] && !mod.hidden[a.cid]).length; m.textContent = "Q&A · 남은 질문 " + open + "개"; }
+    else {
+      const vis = [...people.values()].filter(p => !mod.hidden[p.cid]);
+      const top = (field, skip) => { const c = {}; vis.forEach(p => String(p[field] || "").split(", ").filter(v => v && v !== skip).forEach(v => c[v] = (c[v] || 0) + 1)); const b = Object.entries(c).sort((a, b) => b[1] - a[1])[0]; return b; };
+      const msgs = ["체크인 " + vis.length + "명 · 소개 " + Object.keys(mod.done).filter(c => people.has(c) && !mod.hidden[c]).length + "명"];
+      const mb = top("mbti", "몰라요"), it = top("interest"), fu = top("future", "아직 탐색 중");
+      if (mb && mb[1] > 1) msgs.push("오늘의 MBTI 1위 · " + mb[0] + " " + mb[1] + "명");
+      if (it && it[1] > 1) msgs.push("관심 분야 1위 · " + it[0] + " " + it[1] + "명");
+      if (fu && fu[1] > 1) msgs.push("10년 뒤 " + fu[0] + " · " + fu[1] + "명");
+      m.textContent = msgs[ledI % msgs.length];
+    }
+    stat.textContent = "입장 " + visibleCount() + " · 질문 " + asks.size;
+  }
+  const bar = mk("div", "bar");
+  bar.innerHTML = '<span class="badge px">' + (DEMO ? "DEMO" : K.LIVE ? "LIVE" : "LOCAL") + '</span>' +
+    '<button data-k="qr">체크인 QR (C)</button><button data-k="intro" class="on">소개 모드 (1)</button><button data-k="qa">질문 모드 (2)</button>' +
+    '<button data-k="rand">랜덤 뽑기 (R)</button><button data-k="fs">전체화면 (F)</button><span class="st"></span>';
+  const stat = bar.querySelector(".st");
+  bar.querySelectorAll("button").forEach(b => b.onclick = e => { e.stopPropagation(); act(b.dataset.k); });
+  function setMode(m) { mode = m; clearSel(); bar.querySelector('[data-k=intro]').classList.toggle("on", m === "intro"); bar.querySelector('[data-k=qa]').classList.toggle("on", m === "qa"); qlist.classList.toggle("hidden", m !== "qa"); renderQuestions(); updateLed(); }
+  let qrEl = null;
+  function toggleQR() {
+    if (qrEl) { qrEl.remove(); qrEl = null; return; }
+    qrEl = mk("div", "qr"); qrEl.innerHTML = '<div class="box" id="qrbox"></div><div class="tx"><div class="px">KYPSN PIXEL HOTEL · CHECK-IN</div><h2>체크인하고 14층에 입장하세요</h2><p>QR을 찍어 이름·한 줄 소개를 쓰면<br>내 캐릭터가 이 화면에 나타납니다.</p><div class="url"></div></div>';
+    qrEl.querySelector(".url").textContent = CFG.joinUrl.replace(/^https?:\/\//, "");
+    qrEl.onclick = toggleQR;
+    try { new QRCode(qrEl.querySelector("#qrbox"), { text: CFG.joinLink, width: 512, height: 512, correctLevel: QRCode.CorrectLevel.M }); } catch (e) { qrEl.querySelector("#qrbox").textContent = CFG.joinUrl; }
+  }
+  function act(k) {
+    if (k === "qr") toggleQR();
+    else if (k === "intro") setMode("intro");
+    else if (k === "qa") setMode("qa");
+    else if (k === "rand") { if (mode !== "intro") setMode("intro"); randomPick(); }
+    else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
+  }
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") { if (qrEl) toggleQR(); else clearSel(); }
+    else if (e.key === "Enter") { const b = card.querySelector('[data-a=done]'); if (b && !card.classList.contains("hidden")) b.click(); }
+    else ({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs" })[e.key.toLowerCase()] && act(({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs" })[e.key.toLowerCase()]);
+  });
+  let hideT; document.addEventListener("mousemove", () => { bar.classList.add("show"); clearTimeout(hideT); hideT = setTimeout(() => bar.classList.remove("show"), 2500); });
+
+  // ── 데이터 동기화 ───────────────────────────────────────
+  function sync(entries) {
+    let newAsk = false;
+    entries.forEach(e => {
+      if (!e || !e.cid) return;
+      if (e.kind === "intro") {
+        const p = people.get(e.cid);
+        if (!p) addPerson(e, !first);
+        else { FIELDS.forEach(k => p[k] = e[k] || ""); if (e.name && e.name !== p.name) { p.name = e.name; p.el.querySelector(".nm").textContent = p.name; } paintAgent(p); }
+      } else if (e.kind === "ask") { if (addAsk(e)) newAsk = true; }
+    });
+    if (newAsk && !first && mode === "qa") toast("💬 새 질문이 올라왔어요");
+    first = false; runQueue(); renderQuestions(); updateLed();
+  }
+
+  if (DEMO) {
+    const NAMES = ["김하늘", "이서준", "박지우", "최민서", "정도윤", "강서연", "조하준", "윤지민", "장예린", "임현우", "한소율", "오태윤", "서지호", "신유나", "권도현", "황채원", "안시우", "송하린", "류건우", "전수아"];
+    const ROLES = ["내과 전공의 · 의공학 박사과정", "정형외과 전문의 · 웨어러블 센서 연구", "의대 본과 3학년 · 창업 동아리", "영상의학과 전공의 · AI 판독 연구", "재활의학과 전문의 · 보행 분석", "가정의학과 · 디지털헬스 스타트업", "병리과 전공의 · 공간 전사체", "소아청소년과 · 임상시험 설계"];
+    const QS = ["진료실 문제를 연구 주제로 바꾸는 법", "임상과 연구 시간을 어떻게 나눌까", "논문 말고 제품으로 가려면 무엇부터?", "공학 박사 후 임상 복귀 타이밍", ""];
+    const MEETS = ["창업해 본 선배", "웨어러블 하는 분", "VC 관점이 궁금해요", "같은 과 의사과학자", ""];
+    const ASKS = ["의사과학자로 창업할 때 가장 먼저 포기한 것은?", "임상 데이터 접근은 어떻게 풀었나요?", "투자자가 의사 창업자에게 가장 걱정하는 점은?", "전공의 때 연구를 이어가는 현실적인 방법은?"];
+    const TG = CFG.targets || ["패널 전체"];
+    const demo = []; let n = 0, t0 = Date.now();
+    const POS = ["전공의", "전문의·교수", "의대생", "전공의", "전임의", "산업계·창업", "대학원생", "전문의·교수"], INT = ["연구, AI·디지털", "의료기기, 창업", "창업, 투자·금융", "AI·디지털", "연구, 의료기기", "창업, 산업계", "신약·바이오, 연구", "정책·제도"], FUT = ["창업가", "연구하는 임상의", "아직 탐색 중", "교수", "창업가", "산업계 리더", "투자자"], MB = ["ENTJ", "INTP", "ENFP", "ISTJ", "ENTJ", "INFJ", "몰라요", "ESTP", "ENTJ"], IFN = ["셰프", "", "건축가", "프로게이머", "", "기자"];
+    const mkIntro = i => ({ kind: "intro", cid: "demo" + i, name: NAMES[i % NAMES.length], role: ROLES[i % ROLES.length], pos: POS[i % POS.length], interest: INT[i % INT.length], future: FUT[i % FUT.length], mbti: MB[i % MB.length], ifnot: IFN[i % IFN.length], question: QS[i % QS.length], meet: MEETS[i % MEETS.length], ts: new Date(t0 + i * 1000).toISOString() });
+    for (; n < 14; n++) demo.push(mkIntro(n));
+    [1, 4, 7].forEach((i, j) => demo.push({ kind: "ask", cid: "demo" + i, name: NAMES[i], target: TG[j % TG.length], ask: ASKS[j], ts: new Date(t0 + 50000 + j).toISOString() }));
+    sync(demo.slice());
+    if (params.get("view") === "qa") setMode("qa");
+    if (params.get("view") === "card") setTimeout(() => select(people.get("demo2")), 300);
+    if (params.get("view") === "ask") { setMode("qa"); setTimeout(() => showAsk([...asks.values()][0]), 300); }
+    setInterval(() => {
+      if (n < NAMES.length) { demo.push(mkIntro(n)); if (n % 3 === 0) demo.push({ kind: "ask", cid: "demo" + n, name: NAMES[n], target: TG[n % TG.length], ask: ASKS[n % ASKS.length], ts: new Date(Date.now()).toISOString() }); n++; }
+      sync(demo.slice());
+    }, 3500);
+  } else {
+    K.listen(sync, CFG.pollMs);
+  }
+  updateLed();
+})();
+</script>
+</body>
+</html>

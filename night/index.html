@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>KYPSN Pixel Hotel · 체크인</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0E1630; --navy2:#17224A; --ink:#F3EEDF; --muted:#AEB6CF; --gold:#E2B857; --gold2:#B8912A; --red:#C25B4E; --line:#2C3866; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--navy); color: var(--ink); font-family: "Noto Sans KR", system-ui, sans-serif; }
+  body { min-height: 100vh; padding: 0 0 40px; }
+  .px { font-family: "Press Start 2P", monospace; letter-spacing: .04em; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+  header canvas { display: block; width: 100%; image-rendering: pixelated; }
+  .brand { text-align: center; margin: 14px 0 4px; }
+  .brand .px { font-size: 13px; color: var(--gold); }
+  .brand h1 { font-size: 19px; margin: 10px 0 4px; font-weight: 900; }
+  .brand p { margin: 0; color: var(--muted); font-size: 13px; }
+  .card { background: var(--navy2); border: 2px solid var(--line); border-radius: 6px; padding: 18px 16px; margin-top: 18px; box-shadow: 0 4px 0 #070B1A; }
+  .card h2 { margin: 0 0 4px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .px { font-size: 9px; color: var(--gold); }
+  .hint { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; line-height: 1.5; }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 14px 0 6px; }
+  label small { font-weight: 400; color: var(--muted); }
+  input, textarea { width: 100%; background: #0B1228; color: var(--ink); border: 2px solid var(--line); border-radius: 4px; padding: 11px 12px; font: inherit; font-size: 16px; }
+  textarea { resize: vertical; min-height: 64px; }
+  input:focus, textarea:focus { outline: none; border-color: var(--gold); }
+  .preview { display: flex; align-items: center; gap: 14px; background: #0B1228; border: 2px dashed var(--line); border-radius: 4px; padding: 10px 12px; margin-top: 16px; }
+  .preview canvas { width: 48px; height: 60px; image-rendering: pixelated; }
+  .preview div { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+  .btn { display: block; width: 100%; margin-top: 18px; padding: 15px; border: 0; border-radius: 4px; background: var(--gold); color: #1A1406; font: inherit; font-weight: 900; font-size: 16px; box-shadow: 0 4px 0 var(--gold2); cursor: pointer; text-align: center; text-decoration: none; }
+  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold2); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--line); box-shadow: none; }
+  .btn[disabled] { opacity: .5; }
+  .consent { font-size: 11.5px; color: var(--muted); margin-top: 12px; line-height: 1.55; }
+  .mode { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 3px; background: #3A2A12; color: var(--gold); margin-top: 8px; }
+  .hidden { display: none !important; }
+
+  /* 엘리베이터 */
+  .elev { text-align: center; padding: 26px 0 10px; }
+  .floor { display: inline-block; background: #120808; color: #FF8A3D; border: 3px solid #3A2A2A; padding: 10px 18px; font-size: 22px; min-width: 120px; text-shadow: 0 0 8px #FF6A1A; }
+  .shaft { position: relative; width: 170px; height: 200px; margin: 18px auto 0; background: #0B0F20; border: 6px solid var(--gold2); overflow: hidden; }
+  .shaft .in { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; background: radial-gradient(ellipse at 50% 30%, #FFF2C4 0, #C9A85A 45%, #4A3A1E 100%); }
+  .shaft .in canvas { width: 96px; height: 120px; image-rendering: pixelated; margin-bottom: 10px; }
+  .door { position: absolute; top: 0; bottom: 0; width: 50%; background: linear-gradient(90deg, #8E97AB, #C4CBD9 50%, #8E97AB); transition: transform 1s ease-in-out; }
+  .door.l { left: 0; border-right: 1px solid #555D70; } .door.r { right: 0; border-left: 1px solid #555D70; }
+  .shaft.open .door.l { transform: translateX(-100%); } .shaft.open .door.r { transform: translateX(100%); }
+  .pop { position: absolute; top: 14px; left: 50%; transform: translateX(-50%) scale(0); font-weight: 900; color: #1A1406; background: #fff; padding: 4px 10px; border-radius: 12px; font-size: 15px; transition: transform .3s cubic-bezier(.3,1.8,.5,1); }
+  .shaft.open .pop { transform: translateX(-50%) scale(1); transition-delay: .9s; }
+  .welcome { margin-top: 14px; font-size: 15px; line-height: 1.6; }
+  .welcome b { color: var(--gold); }
+
+  /* 키카드 */
+  .key { position: relative; margin-top: 18px; border-radius: 10px; padding: 16px; background: linear-gradient(135deg, #1B2A5E, #0E1630 70%); border: 2px solid var(--gold2); display: flex; gap: 14px; align-items: center; }
+  .key canvas { width: 64px; height: 80px; image-rendering: pixelated; background: #0B1228; border-radius: 4px; }
+  .key .px { font-size: 8px; color: var(--gold); }
+  .key .nm { font-size: 18px; font-weight: 900; margin: 6px 0 2px; }
+  .key .rl { font-size: 12.5px; color: var(--muted); }
+  .key .chip { position: absolute; right: 14px; top: 14px; width: 26px; height: 20px; border-radius: 3px; background: linear-gradient(135deg, #E2B857, #8C6A1C); }
+
+  .targets { display: flex; flex-wrap: wrap; gap: 8px; }
+  .targets button { border: 2px solid var(--line); background: #0B1228; color: var(--ink); border-radius: 18px; padding: 8px 13px; font: inherit; font-size: 13.5px; cursor: pointer; }
+  .targets button.on { border-color: var(--gold); background: #3A2A12; color: var(--gold); }
+  .targets.mbti { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .targets.mbti button { padding: 8px 0; border-radius: 4px; font-size: 13px; }
+  .targets.mbti button:last-child { grid-column: span 4; }
+  .mine { margin: 14px 0 0; padding: 0; list-style: none; }
+  .mine li { font-size: 13px; border-top: 1px solid var(--line); padding: 9px 0; color: var(--muted); }
+  .mine li b { color: var(--ink); font-weight: 700; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(120px); background: var(--gold); color: #1A1406; font-weight: 900; padding: 12px 18px; border-radius: 6px; transition: transform .3s; z-index: 9; max-width: 90vw; text-align: center; }
+  .toast.on { transform: translateX(-50%) translateY(0); }
+  footer { text-align: center; color: #5E6890; font-size: 11px; margin-top: 26px; }
+</style>
+</head>
+<body>
+<header><canvas id="facade" width="240" height="120"></canvas></header>
+<div class="wrap">
+  <div class="brand">
+    <div class="px">KYPSN PIXEL HOTEL</div>
+    <h1>Korean Young Physician Scientists Night 2026</h1>
+    <p>12월 5일(금) 18:00 · 명동 14F On Air Stage</p>
+    <span id="modeBadge" class="mode hidden">로컬 시험 모드: 이 브라우저 안에서만 저장됩니다</span>
+  </div>
+
+  <!-- 1. 체크인 -->
+  <section id="checkin" class="card">
+    <h2><span class="px">CHECK-IN</span> 체크인 카드</h2>
+    <p class="hint">쓰고 나면 내 픽셀 캐릭터가 14층 행사장에 입장합니다. 사회자가 무대 화면에서 골라 소개해 드려요.</p>
+    <form id="fIntro" autocomplete="off">
+      <label>이름 <small>(필수)</small></label>
+      <input id="iName" maxlength="20" required placeholder="홍길동">
+      <label>소속 · 전공 한 줄 <small>(필수)</small></label>
+      <input id="iRole" maxlength="40" required placeholder="예: OO대병원 정형외과 · 의공학 박사과정">
+      <label>지금 나는</label>
+      <div class="targets" data-pick="pos" data-one="1"></div>
+      <label>관심 분야 <small>(여러 개 골라도 됩니다)</small></label>
+      <div class="targets" data-pick="interest"></div>
+      <label>10년 뒤 나는?</label>
+      <div class="targets" data-pick="future" data-one="1"></div>
+      <label>MBTI <small>(재미로)</small></label>
+      <div class="targets mbti" data-pick="mbti" data-one="1"></div>
+      <label>요즘 진로 고민 한 줄</label>
+      <textarea id="iQuestion" maxlength="80" placeholder="예: 수련과 박사, 무엇을 먼저 해야 할까?"></textarea>
+      <label>오늘 꼭 만나고 싶은 사람</label>
+      <input id="iMeet" maxlength="40" placeholder="예: 창업해 본 선배, 웨어러블 하는 분">
+      <label>의사가 안 됐다면 나는? <small>(재미로)</small></label>
+      <input id="iIfnot" maxlength="30" placeholder="예: 셰프, 프로게이머, 건축가">
+      <div class="preview"><canvas id="pv"></canvas><div>이름을 쓰면 내 캐릭터가 정해집니다.<br>이름마다 모습이 다릅니다.</div></div>
+      <button class="btn" id="bIn" type="submit">체크인하고 14층으로 ▲</button>
+      <p class="consent">입력한 내용은 행사 무대 화면에 보이고, 12시간 뒤 자동으로 지워집니다. 연락처는 받지 않습니다.</p>
+    </form>
+  </section>
+
+  <!-- 2. 엘리베이터 -->
+  <section id="lift" class="card hidden">
+    <div class="elev">
+      <div class="floor px" id="floorNo">1F</div>
+      <div class="shaft" id="shaft">
+        <div class="in"><canvas id="liftMe"></canvas></div>
+        <div class="door l"></div><div class="door r"></div>
+        <div class="pop">뿅!</div>
+      </div>
+      <p class="welcome hidden" id="welcome"><b>14층 On Air Stage 입장 완료!</b><br>무대 화면에 내 캐릭터가 나타났는지 보세요.</p>
+    </div>
+  </section>
+
+  <!-- 3. 키카드 + 질문 -->
+  <section id="room" class="hidden">
+    <div class="key">
+      <canvas id="keyMe"></canvas>
+      <div>
+        <div class="px">ROOM 14F · ON AIR STAGE</div>
+        <div class="nm" id="kName"></div>
+        <div class="rl" id="kRole"></div>
+      </div>
+      <div class="chip"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="px">Q&amp;A</span> 질문 남기기</h2>
+      <p class="hint">질문을 보내면 내 캐릭터 머리 위에 말풍선이 뜹니다. 패널 토론 때 사회자가 골라 읽습니다.</p>
+      <form id="fAsk" autocomplete="off">
+        <label>누구에게</label>
+        <div class="targets" id="targets"></div>
+        <label>질문</label>
+        <textarea id="iAsk" maxlength="120" required placeholder="예: 의사과학자로 창업할 때 가장 먼저 포기해야 했던 것은?"></textarea>
+        <button class="btn" type="submit">질문 보내기</button>
+      </form>
+      <ul class="mine" id="mine"></ul>
+    </div>
+
+    <a class="btn ghost hidden" id="openChat" target="_blank" rel="noopener">행사 오픈 채팅방 들어가기</a>
+    <button class="btn ghost" id="bEdit" type="button">체크인 카드 고치기</button>
+  </section>
+
+  <footer>한국젊은의사과학자네트워크(KYPSN) · kypsn.org</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="night.js"></script>
+<script>
+(function () {
+  const K = window.KNight, CFG = K.CFG;
+  const $ = id => document.getElementById(id);
+  const ME_KEY = "kypsn-night-me", ASK_KEY = "kypsn-night-myasks";
+  const get = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+  const set = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  if (!K.LIVE) $("modeBadge").classList.remove("hidden");
+
+  // ── 호텔 외관 ──
+  (function facade() {
+    const c = $("facade"), x = c.getContext("2d"), W = 240, H = 120, r = K.rng(20261205);
+    const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#070B1E"); g.addColorStop(1, "#1C2A5C");
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    for (let i = 0; i < 40; i++) { x.fillStyle = r() < .5 ? "#3C4A80" : "#8A94C0"; x.fillRect(Math.floor(r() * W), Math.floor(r() * 50), 1, 1); }
+    // 남산타워
+    x.fillStyle = "#1E2850"; x.fillRect(206, 46, 3, 60); x.fillRect(202, 42, 11, 5); x.fillRect(207, 30, 1, 12);
+    x.fillStyle = "#FF4A4A"; x.fillRect(207, 29, 1, 1);
+    // 뒷 건물들
+    for (let bx = 0; bx < W; ) { const w = 10 + Math.floor(r() * 16), h = 20 + Math.floor(r() * 40); x.fillStyle = "#121A38"; x.fillRect(bx, H - h, w, h);
+      for (let wy = H - h + 3; wy < H - 4; wy += 4) for (let wx = bx + 2; wx < bx + w - 2; wx += 3) if (r() < .25) { x.fillStyle = "#3A4470"; x.fillRect(wx, wy, 1, 2); }
+      bx += w + 1; }
+    // 호텔 본관 (14층)
+    const hx = 84, hw = 72, top = 14, fh = 7;
+    x.fillStyle = "#26305A"; x.fillRect(hx, top, hw, H - top);
+    x.fillStyle = "#313C6E"; x.fillRect(hx, top, 3, H - top);
+    for (let f = 0; f < 14; f++) {
+      const y = H - 4 - (f + 1) * fh;
+      for (let wx = hx + 6; wx < hx + hw - 4; wx += 6) {
+        const lit = f === 13 ? true : r() < .45;
+        x.fillStyle = f === 13 ? "#FFD36B" : (lit ? "#E8C877" : "#18203F"); x.fillRect(wx, y + 1, 4, 4);
+      }
+    }
+    // 14층 강조
+    x.fillStyle = "rgba(255,200,90,.25)"; x.fillRect(hx - 4, H - 4 - 14 * fh - 2, hw + 8, fh + 3);
+    // 간판
+    x.fillStyle = "#0B0F22"; x.fillRect(hx + 14, top - 10, hw - 28, 9);
+    x.fillStyle = "#E2B857"; x.font = "7px monospace"; x.textAlign = "center"; x.fillText("KYPSN", hx + hw / 2, top - 3);
+    // 입구
+    x.fillStyle = "#E2B857"; x.fillRect(hx + hw / 2 - 8, H - 10, 16, 10); x.fillStyle = "#3A2A12"; x.fillRect(hx + hw / 2 - 1, H - 10, 1, 10);
+    x.fillStyle = "#0A0E1C"; x.fillRect(0, H - 2, W, 2);
+  })();
+
+  // ── 체크인 ──
+  const pv = $("pv");
+  function pvDraw() { K.draw(pv, ($("iName").value || "KYPSN").trim(), 4, 0, K.look(typeof picks !== "undefined" ? picks.pos.join("") : "")); }
+  $("iName").addEventListener("input", pvDraw); pvDraw();
+
+  // 고르기 칩
+  const OPTS = {
+    pos: ["의대생", "전공의", "전임의", "전문의·교수", "대학원생", "산업계·창업"],
+    interest: ["연구", "창업", "산업계", "AI·디지털", "의료기기", "신약·바이오", "정책·제도", "투자·금융"],
+    future: ["연구하는 임상의", "교수", "창업가", "산업계 리더", "투자자", "아직 탐색 중"],
+    mbti: ["INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP", "몰라요"]
+  };
+  var picks = { pos: [], interest: [], future: [], mbti: [] };
+  document.querySelectorAll("[data-pick]").forEach(box => {
+    const k = box.dataset.pick, one = !!box.dataset.one;
+    OPTS[k].forEach(v => { const b = document.createElement("button"); b.type = "button"; b.textContent = v;
+      b.onclick = () => { const a = picks[k], i = a.indexOf(v);
+        if (i >= 0) a.splice(i, 1); else { if (one) a.length = 0; a.push(v); }
+        [...box.children].forEach(x => x.classList.toggle("on", a.includes(x.textContent))); pvDraw(); };
+      box.appendChild(b); });
+  });
+  function setPicks(me) { Object.keys(picks).forEach(k => { picks[k] = String(me[k] || "").split(", ").filter(Boolean);
+    document.querySelectorAll('[data-pick="' + k + '"] button').forEach(b => b.classList.toggle("on", picks[k].includes(b.textContent))); }); }
+
+  function fillForm(me) { $("iName").value = me.name || ""; $("iRole").value = me.role || ""; $("iQuestion").value = me.question || ""; $("iMeet").value = me.meet || ""; $("iIfnot").value = me.ifnot || ""; setPicks(me); pvDraw(); }
+
+  function toast(t) { const el = $("toast"); el.textContent = t; el.classList.add("on"); setTimeout(() => el.classList.remove("on"), 2200); }
+
+  $("fIntro").addEventListener("submit", async e => {
+    e.preventDefault();
+    const me = { kind: "intro", cid: K.myId(), name: $("iName").value.trim(), role: $("iRole").value.trim(), question: $("iQuestion").value.trim(), meet: $("iMeet").value.trim(), ifnot: $("iIfnot").value.trim(),
+      pos: picks.pos.join(", "), interest: picks.interest.join(", "), future: picks.future.join(", "), mbti: picks.mbti.join(", ") };
+    if (!me.name || !me.role) return;
+    $("bIn").disabled = true;
+    try { await K.submit(me); } catch (err) { $("bIn").disabled = false; toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
+    const first = !get(ME_KEY, null);
+    set(ME_KEY, me);
+    $("bIn").disabled = false;
+    if (first) ride(me); else { showRoom(me); toast("체크인 카드를 고쳤어요"); }
+  });
+
+  function ride(me) {
+    $("checkin").classList.add("hidden"); $("lift").classList.remove("hidden");
+    K.draw($("liftMe"), me.name, 6, 0, K.look(me.pos));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    let f = 1; const t = setInterval(() => {
+      f++; $("floorNo").textContent = f + "F";
+      if (f >= 14) { clearInterval(t); $("shaft").classList.add("open"); setTimeout(() => $("welcome").classList.remove("hidden"), 1200); setTimeout(() => showRoom(me), 3600); }
+    }, 170);
+  }
+
+  function showRoom(me) {
+    $("checkin").classList.add("hidden"); $("lift").classList.add("hidden"); $("room").classList.remove("hidden");
+    K.draw($("keyMe"), me.name, 4, 0, K.look(me.pos)); $("kName").textContent = me.name; $("kRole").textContent = me.role;
+    renderMine();
+  }
+
+  // ── 질문 ──
+  let target = (CFG.targets || ["패널 전체"])[0];
+  const tg = $("targets");
+  (CFG.targets || ["패널 전체"]).forEach(t => { const b = document.createElement("button"); b.type = "button"; b.textContent = t; if (t === target) b.classList.add("on");
+    b.onclick = () => { target = t; [...tg.children].forEach(x => x.classList.toggle("on", x === b)); }; tg.appendChild(b); });
+
+  function renderMine() { const ul = $("mine"); ul.innerHTML = ""; get(ASK_KEY, []).slice().reverse().forEach(a => { const li = document.createElement("li"); li.innerHTML = "<b></b> → "; li.firstChild.textContent = a.target; li.appendChild(document.createTextNode(a.ask)); ul.appendChild(li); }); }
+
+  $("fAsk").addEventListener("submit", async e => {
+    e.preventDefault();
+    const me = get(ME_KEY, null); const text = $("iAsk").value.trim(); if (!me || !text) return;
+    const a = { kind: "ask", cid: K.myId(), name: me.name, target, ask: text };
+    try { await K.submit(a); } catch (err) { toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
+    const list = get(ASK_KEY, []); list.push(a); set(ASK_KEY, list);
+    $("iAsk").value = ""; renderMine(); toast("질문이 무대로 올라갔어요");
+  });
+
+  $("bEdit").onclick = () => { fillForm(get(ME_KEY, {})); $("room").classList.add("hidden"); $("checkin").classList.remove("hidden"); $("bIn").textContent = "고친 내용 보내기"; };
+  if (CFG.openChat) { const a = $("openChat"); a.href = CFG.openChat; a.classList.remove("hidden"); }
+
+  const saved = get(ME_KEY, null);
+  if (saved) showRoom(saved);
+})();
+</script>
+</body>
+</html>
