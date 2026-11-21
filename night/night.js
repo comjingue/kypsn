@@ -114,7 +114,8 @@
   async function submit(entry) {
     entry.ts = entry.ts || new Date().toISOString();
     if (!LIVE) { localAdd(entry); return true; }
-    if (NTFY) { const r = await fetch(NTFY_URL, { method: "POST", body: "KN1:" + encodeURIComponent(JSON.stringify(entry)) }); if (!r.ok) throw new Error("ntfy " + r.status); return true; }
+    if (NTFY) { const bytes = new TextEncoder().encode(JSON.stringify(entry)); let bin = ""; bytes.forEach(b => bin += String.fromCharCode(b));
+      const r = await fetch(NTFY_URL, { method: "POST", body: "KN2:" + btoa(bin) }); if (!r.ok) throw new Error("ntfy " + r.status); return true; }
     const body = new URLSearchParams();
     Object.keys(CFG.entries).forEach(k => { if (CFG.entries[k] && entry[k] != null) body.append("entry." + CFG.entries[k], entry[k]); });
     await fetch(CFG.formAction, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() });
@@ -146,7 +147,16 @@
   }
 
   // ntfy 메시지 → 항목
-  function fromNtfy(m) { if (!m || m.event !== "message" || typeof m.message !== "string" || m.message.indexOf("KN1:") !== 0) return null; try { const e = JSON.parse(decodeURIComponent(m.message.slice(4))); e._id = m.id; return e; } catch (x) { return null; } }
+  function fromNtfy(m) {
+    if (!m || m.event !== "message" || typeof m.message !== "string") return null;
+    try {
+      let s;
+      if (m.message.indexOf("KN2:") === 0) s = new TextDecoder().decode(Uint8Array.from(atob(m.message.slice(4)), c => c.charCodeAt(0)));
+      else if (m.message.indexOf("KN1:") === 0) s = decodeURIComponent(m.message.slice(4));
+      else return null;
+      const e = JSON.parse(s); e._id = m.id; return e;
+    } catch (x) { return null; }
+  }
 
   // 새 항목이 생길 때마다 onAll(전체 목록)을 부른다
   function listen(onAll, pollMs) {

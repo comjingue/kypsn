@@ -162,8 +162,8 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js"></script>
-<script src="night.js"></script>
+<script src="config.js?v=4"></script>
+<script src="night.js?v=4"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -255,7 +255,7 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
     let f = 1; const t = setInterval(() => {
       f++; $("floorNo").textContent = f + "F";
-      if (f >= 14) { clearInterval(t); $("shaft").classList.add("open"); setTimeout(() => $("welcome").classList.remove("hidden"), 1200); setTimeout(() => showRoom(me), 3600); }
+      if (f >= 14) { clearInterval(t); $("shaft").classList.add("open"); setTimeout(() => $("welcome").classList.remove("hidden"), 1200); setTimeout(() => { if ($("room").classList.contains("hidden")) showRoom(get(ME_KEY, me)); }, 3600); }
     }, 170);
   }
 

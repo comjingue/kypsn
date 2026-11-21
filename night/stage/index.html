@@ -110,8 +110,8 @@
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="../config.js"></script>
-<script src="../night.js"></script>
+<script src="../config.js?v=4"></script>
+<script src="../night.js?v=4"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -409,16 +409,21 @@
 
   // ── 데이터 동기화 ───────────────────────────────────────
   function sync(entries) {
-    let newAsk = false;
+    let newAsk = false; const edited = new Set();
     entries.forEach(e => {
       if (!e || !e.cid) return;
       if (e.kind === "intro") {
         const p = people.get(e.cid);
         if (!p) addPerson(e, !first);
-        else { FIELDS.forEach(k => p[k] = e[k] || ""); if (e.name && e.name !== p.name) { p.name = e.name; p.el.querySelector(".nm").textContent = p.name; } paintAgent(p); }
+        else {
+          const before = JSON.stringify([p.name].concat(FIELDS.map(k => p[k])));
+          FIELDS.forEach(k => p[k] = e[k] || ""); if (e.name) { p.name = e.name; p.el.querySelector(".nm").textContent = p.name; }
+          if (before !== JSON.stringify([p.name].concat(FIELDS.map(k => p[k])))) { paintAgent(p); edited.add(p); }
+        }
       } else if (e.kind === "ask") { if (addAsk(e)) newAsk = true; }
     });
     if (newAsk && !first && mode === "qa") toast("💬 새 질문이 올라왔어요");
+    if (!first) edited.forEach(p => { if (p.el.style.visibility === "hidden") return; toast("✏️ " + p.name + " 님이 체크인 카드를 고쳤어요"); p.el.classList.remove("pop"); void p.el.offsetWidth; p.el.classList.add("pop"); setTimeout(() => p.el.classList.remove("pop"), 800); if (selected === p) select(p); });
     first = false; runQueue(); renderQuestions(); updateLed();
   }
 
