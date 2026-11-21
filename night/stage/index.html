@@ -36,7 +36,7 @@
   /* 캐릭터 */
   .agent { position: absolute; cursor: pointer; }
   .agent canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
-  .agent .nm { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); white-space: nowrap; font-size: .78cqw; font-weight: 700; background: rgba(8,12,28,.78); color: #fff; padding: .05cqw .35cqw; border-radius: .25cqw; margin-bottom: .1cqw; pointer-events: none; }
+  .agent .nm { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); white-space: nowrap; font-size: .72cqw; font-weight: 700; background: rgba(8,12,28,.78); color: #fff; padding: .05cqw .25cqw; border-radius: .25cqw; margin-bottom: .1cqw; pointer-events: none; }
   .agent.done .nm::before { content: "★ "; color: var(--gold); }
   .agent.flip canvas { transform: scaleX(-1); }
   .agent.pop { animation: pop .7s cubic-bezier(.3,1.8,.5,1); }
@@ -56,7 +56,7 @@
   .spot { position: absolute; border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 200cqw rgba(0,0,0,.55); z-index: 940; transition: all .4s; background: radial-gradient(circle, rgba(255,240,190,.25), rgba(255,240,190,0) 70%); }
 
   /* 소개·질문 카드 */
-  .card { position: absolute; right: 2.5cqw; top: 50%; transform: translateY(-50%); width: 40cqw; background: rgba(14,22,48,.96); border: .25cqw solid var(--gold); border-radius: .8cqw; padding: 2cqw; z-index: 1000; box-shadow: 0 1cqw 0 rgba(0,0,0,.4); }
+  .card { overflow-wrap: anywhere; position: absolute; right: 2.5cqw; top: 50%; transform: translateY(-50%); width: 40cqw; background: rgba(14,22,48,.96); border: .25cqw solid var(--gold); border-radius: .8cqw; padding: 2cqw; z-index: 1000; box-shadow: 0 1cqw 0 rgba(0,0,0,.4); }
   .card.left { right: auto; left: 2.5cqw; }
   .card .top { display: flex; gap: 1.6cqw; align-items: center; }
   .card canvas { width: 8cqw; height: 10cqw; image-rendering: pixelated; background: #0B1228; border-radius: .4cqw; }
@@ -81,12 +81,12 @@
   .qitem { display: flex; gap: .7cqw; padding: .7cqw .4cqw; border-top: .1cqw solid #2C3866; cursor: pointer; align-items: flex-start; }
   .qitem:hover { background: #17224A; }
   .qitem canvas { width: 2.2cqw; height: 2.75cqw; image-rendering: pixelated; flex: none; }
-  .qitem .tx { font-size: 1.05cqw; line-height: 1.4; }
+  .qitem .tx { overflow-wrap: anywhere; font-size: 1.05cqw; line-height: 1.4; }
   .qitem .tg { font-size: .8cqw; color: var(--gold); font-weight: 700; }
   .qitem.done { opacity: .4; }
 
   /* 토스트·조작 */
-  .toast { position: absolute; left: 50%; top: 1.4cqw; transform: translateX(-50%); background: rgba(14,22,48,.92); border: .15cqw solid var(--gold); color: #fff; font-weight: 900; font-size: 1.25cqw; padding: .6cqw 1.4cqw; border-radius: 2cqw; z-index: 1001; transition: opacity .3s; opacity: 0; pointer-events: none; white-space: nowrap; }
+  .toast { max-width: 92%; overflow: hidden; text-overflow: ellipsis; position: absolute; left: 50%; top: 1.4cqw; transform: translateX(-50%); background: rgba(14,22,48,.92); border: .15cqw solid var(--gold); color: #fff; font-weight: 900; font-size: 1.25cqw; padding: .6cqw 1.4cqw; border-radius: 2cqw; z-index: 1001; transition: opacity .3s; opacity: 0; pointer-events: none; white-space: nowrap; }
   .toast.on { opacity: 1; }
   .bar { position: absolute; left: 50%; bottom: 1.2cqw; transform: translateX(-50%); display: flex; gap: .5cqw; align-items: center; background: rgba(8,12,28,.88); border: .12cqw solid #2C3866; border-radius: 3cqw; padding: .45cqw .6cqw; z-index: 1100; opacity: .25; transition: opacity .3s; }
   .bar:hover, .bar.show { opacity: 1; }
@@ -110,8 +110,8 @@
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="../config.js?v=4"></script>
-<script src="../night.js?v=4"></script>
+<script src="../config.js?v=5"></script>
+<script src="../night.js?v=5"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -231,7 +231,8 @@
   const saveMod = () => { try { localStorage.setItem(STK, JSON.stringify(mod)); } catch (e) {} };
   const FIELDS = ["sex", "role", "pos", "interest", "future", "mbti", "question", "meet", "ifnot"];
   const people = new Map();
-  const lookOf = cid => { const p = people.get(cid); return p ? K.look(p.pos, p.sex) : null; };   // cid → person
+  const lookOf = cid => { const p = people.get(cid); return p ? K.look(p.pos, p.sex) : null; };
+  const keyFor = a => { const p = people.get(a.cid); return keyOf(p ? p.name : a.name, a.cid); };
   const asks = new Map();     // key → ask
   let seatN = 0, first = true, mode = "intro", selected = null;
   const queue = [];
@@ -240,12 +241,21 @@
 
   function makeAgent(p) {
     const el = mk("div", "agent"); const c = mk("canvas", "", el); c.width = 16; c.height = 20;
-    const nm = mk("div", "nm", el); nm.textContent = p.name;
-    el.onclick = ev => { ev.stopPropagation(); select(p); };
+    const nm = mk("div", "nm", el); nm.textContent = shortName(p.name);
+    el.onclick = ev => { ev.stopPropagation(); if (walkers.has(p) || el.style.visibility === "hidden") return; stopRoll(); select(p); };
     p.el = el; p.cv = c; p.frame = 0; paintAgent(p);
     return el;
   }
-  function paintAgent(p) { const x = p.cv.getContext("2d"); x.clearRect(0, 0, 16, 20); K.paint(x, p.name, 0, 0, 1, p.frame, K.look(p.pos, p.sex)); }
+  // 이름표는 짧게 (옆자리와 겹치지 않게), 모습은 이름+기기 번호로 정해 동명이인도 다르게
+  function shortName(n) {   // 한글 1칸, 영문·숫자 0.6칸으로 세어 4.5칸까지 (옆자리 이름표와 안 겹치게)
+    n = String(n || "").trim(); const a = [...n]; let w = 0, out = "";
+    const cwOf = ch => ch.charCodeAt(0) < 0x250 ? .6 : 1;
+    if (a.reduce((s, ch) => s + cwOf(ch), 0) <= 4.5) return n;
+    for (let i = 0; i < a.length; i++) { const cw = cwOf(a[i]); if (w + cw > 3.9) return out.trim() + "…"; w += cw; out += a[i]; }
+    return out;
+  }
+  const keyOf = (name, cid) => String(name || "") + "|" + String(cid || "");
+  function paintAgent(p) { const x = p.cv.getContext("2d"); x.clearRect(0, 0, 16, 20); K.paint(x, keyOf(p.name, p.cid), 0, 0, 1, p.frame, K.look(p.pos, p.sex)); }
   function setPos(p, x, y) { p.x = x; p.y = y; place(p.el, x - 8, y - 20, 16, 20); p.el.style.zIndex = 100 + Math.round(y); }
 
   function addPerson(e, animate) {
@@ -258,23 +268,30 @@
   }
 
   // ── 입장 연출: 엘리베이터 → 뿅 → 걸어서 자리로 ───────────
-  let busy = false;
+  let busy = false, closeT = null;
   function runQueue() {
     if (busy || !queue.length) return; busy = true;
-    const p = queue.shift();
-    sign.classList.add("on"); elev.classList.add("open");
+    // 한꺼번에 몰리면 문을 열어 둔 채 여러 명이 같이 내리고 빨리 걷는다 (내 캐릭터를 오래 기다리지 않게)
+    const n = queue.length >= 6 ? 3 : queue.length >= 3 ? 2 : 1;
+    const group = queue.splice(0, n);
+    const f = queue.length >= 3 ? .45 : queue.length >= 1 ? .6 : 1;
+    clearTimeout(closeT); sign.classList.add("on"); elev.classList.add("open");
+    group.forEach((p, i) => { p.x = DOOR.x + (i - (group.length - 1) / 2) * 9; setPos(p, p.x, DOOR.y); });
     setTimeout(() => {
-      p.el.style.visibility = ""; p.el.classList.add("pop"); boom(p.x, p.y - 22);
-      toast("🛎 " + p.name + " 님 체크인 · 14F On Air Stage");
+      group.forEach((p, i) => setTimeout(() => { p.el.style.visibility = ""; p.el.classList.add("pop"); boom(p.x, p.y - 22); }, i * 120));
+      const shown = group.filter(p => !mod.hidden[p.cid]);
+      if (shown.length === 1) toast("🛎 " + shown[0].name + " 님 체크인 · 14F On Air Stage");
+      else if (shown.length > 1) toast("🛎 " + shown.map(p => p.name).join(" · ") + " 님 체크인");
       updateLed();
-    }, 450);
+    }, 450 * f);
     setTimeout(() => {
-      p.el.classList.remove("pop");
-      const s = p.seat, aisle = s.stand ? 120 : (s.side < 0 ? AISLES[AISLES.findIndex(a => a > s.y) - 1] : AISLES.find(a => a > s.y));
-      p.path = [[DOOR.x, aisle], [s.x, aisle], [s.x, s.y]]; walkers.add(p);
-    }, 1300);
-    setTimeout(() => { elev.classList.remove("open"); sign.classList.remove("on"); }, 1700);
-    setTimeout(() => { busy = false; runQueue(); }, 2000);
+      group.forEach((p, i) => {
+        p.el.classList.remove("pop");
+        const s = p.seat, aisle = s.stand ? 120 : (s.side < 0 ? AISLES[AISLES.findIndex(a => a > s.y) - 1] : AISLES.find(a => a > s.y));
+        p.path = [[p.x, aisle + (i - 1) * 2], [s.x, aisle + (i - 1) * 2], [s.x, s.y]]; p.speed = f < 1 ? 120 : 75; walkers.add(p);
+      });
+    }, 1300 * f + (group.length - 1) * 120);
+    setTimeout(() => { busy = false; if (!queue.length) closeT = setTimeout(() => { elev.classList.remove("open"); sign.classList.remove("on"); }, 300); runQueue(); }, 2000 * f + (group.length - 1) * 120);
   }
   function boom(x, y) {
     const b = mk("div", "boom"); b.textContent = "뿅!"; b.style.left = pct(x - 6, W); b.style.top = pct(y - 6, H); setTimeout(() => b.remove(), 1300);
@@ -285,7 +302,7 @@
   function step(t) {
     const dt = Math.min(.05, (t - lastT) / 1000); lastT = t;
     walkers.forEach(p => {
-      const [tx, ty] = p.path[0]; const dx = tx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy), v = 75 * dt;
+      const [tx, ty] = p.path[0]; const dx = tx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy), v = (p.speed || 75) * dt;
       if (d <= v) { setPos(p, tx, ty); p.path.shift(); if (!p.path.length) { walkers.delete(p); p.frame = 0; paintAgent(p); p.el.classList.remove("flip"); return; } }
       else setPos(p, p.x + dx / d * v, p.y + dy / d * v);
       p.el.classList.toggle("flip", dx < -0.5);
@@ -306,7 +323,7 @@
     const list = [...asks.values()].filter(a => !mod.hidden[a.cid]).sort((a, b) => (mod.qdone[a.key] ? 1 : 0) - (mod.qdone[b.key] ? 1 : 0) || String(b.ts).localeCompare(String(a.ts)));
     qlist.innerHTML = "<h3>질문 " + list.length + "개 · 눌러서 크게 보기</h3>";
     list.forEach(a => {
-      const it = mk("div", "qitem" + (mod.qdone[a.key] ? " done" : ""), qlist); const c = mk("canvas", "", it); K.draw(c, a.name, 2, 0, lookOf(a.cid));
+      const it = mk("div", "qitem" + (mod.qdone[a.key] ? " done" : ""), qlist); const c = mk("canvas", "", it); K.draw(c, keyFor(a), 2, 0, lookOf(a.cid));
       const tx = mk("div", "", it); tx.innerHTML = '<div class="tg"></div><div class="tx"></div>'; tx.firstChild.textContent = a.name + " → " + a.target; tx.lastChild.textContent = a.ask;
       it.onclick = () => showAsk(a);
     });
@@ -319,6 +336,8 @@
 
   // ── 카드·선택 ───────────────────────────────────────────
   const spot = mk("div", "spot hidden"), card = mk("div", "card hidden");
+  // 글이 길어 카드가 화면을 넘치면 카드 전체를 줄인다
+  function fitCard() { card.style.zoom = 1; let z = 1; while (z > .55 && card.offsetHeight * z > world.clientHeight * .9) { z -= .05; card.style.zoom = z; } }
   function clearSel() { if (selected) selected.el.classList.remove("sel"); selected = null; spot.classList.add("hidden"); card.classList.add("hidden"); }
   function spotOn(p) { card.classList.toggle("left", p.x > W / 2); place(spot, p.x - 22, p.y - 34, 44, 44); spot.classList.remove("hidden"); p.el.classList.add("sel"); selected = p; }
   function select(p) {
@@ -332,31 +351,45 @@
       row("요즘 진로 고민", p.question) +
       '<div class="two">' + row("오늘 만나고 싶은 사람", p.meet) + row("의사가 안 됐다면", p.ifnot) + "</div>" +
       '<div class="btns"><button class="pri" data-a="done">소개 끝 ★ (Enter)</button><button data-a="close">닫기 (Esc)</button><button data-a="hide">화면에서 숨기기</button></div>';
-    K.draw(card.querySelector("canvas"), p.name, 8, 0, K.look(p.pos, p.sex));
+    K.draw(card.querySelector("canvas"), keyOf(p.name, p.cid), 8, 0, K.look(p.pos, p.sex));
     card.querySelector('[data-a=done]').onclick = () => { mod.done[p.cid] = 1; saveMod(); p.el.classList.add("done"); clearSel(); updateLed(); };
     card.querySelector('[data-a=close]').onclick = clearSel;
     card.querySelector('[data-a=hide]').onclick = () => { mod.hidden[p.cid] = 1; saveMod(); p.el.classList.add("hidden"); clearSel(); updateLed(); };
-    card.classList.remove("hidden");
+    card.classList.remove("hidden"); fitCard();
   }
   function showAsk(a) {
     clearSel(); const p = people.get(a.cid); if (p) spotOn(p);
     card.innerHTML = '<div class="top"><canvas></canvas><div><div class="lab px">QUESTION</div><div class="nm"></div><div class="rl"></div></div></div><div class="q"></div>' +
       '<div class="btns"><button class="pri" data-a="done">답변 끝 (Enter)</button><button data-a="close">닫기 (Esc)</button></div>';
-    K.draw(card.querySelector("canvas"), a.name, 8, 0, lookOf(a.cid));
+    K.draw(card.querySelector("canvas"), keyFor(a), 8, 0, lookOf(a.cid));
     card.querySelector(".nm").textContent = a.name; card.querySelector(".rl").textContent = "→ " + a.target; card.querySelector(".q").textContent = a.ask;
     card.querySelector('[data-a=done]').onclick = () => { mod.qdone[a.key] = 1; saveMod(); clearSel(); renderQuestions(); updateLed(); };
     card.querySelector('[data-a=close]').onclick = clearSel;
-    card.classList.remove("hidden");
+    card.classList.remove("hidden"); fitCard();
   }
-  world.addEventListener("click", e => { if (e.target === world || e.target.id === "bg") clearSel(); });
+  world.addEventListener("click", e => { if (e.target === world || e.target.id === "bg") { stopRoll(); clearSel(); } });
 
+  // 룰렛: 돌고 있을 때 R을 또 누르면 무시, Esc·캐릭터 클릭이면 멈춤
+  let rollId = 0, rolling = false, lastPick = null;
   function randomPick() {
+    if (rolling) return;
     const pool = [...people.values()].filter(p => !mod.done[p.cid] && !mod.hidden[p.cid] && !walkers.has(p) && p.el.style.visibility !== "hidden");
     if (!pool.length) return toast("소개할 사람이 더 없어요");
-    let i = 0; const n = 12 + Math.floor(Math.random() * 6);
-    const tick = () => { clearSel(); const p = pool[Math.floor(Math.random() * pool.length)]; if (++i < n) { spotOn(p); setTimeout(tick, 70 + i * 12); } else select(p); };
+    const id = ++rollId; rolling = true;
+    let i = 0; const n = pool.length === 1 ? 1 : 12 + Math.floor(Math.random() * 6);
+    let prev = null;
+    const tick = () => {
+      if (id !== rollId) return;
+      clearSel(); i++;
+      const last = i >= n;
+      let p, tries = 0;
+      do { p = pool[Math.floor(Math.random() * pool.length)]; tries++; } while (pool.length > 1 && tries < 20 && (p === prev || (last && p === lastPick)));
+      if (!last) { spotOn(p); prev = p; setTimeout(tick, 70 + i * 12); }
+      else { rolling = false; lastPick = p; select(p); }
+    };
     tick();
   }
+  function stopRoll() { if (rolling) { rollId++; rolling = false; } }
 
   // ── LED·토스트·조작 바 ───────────────────────────────────
   const tst = mk("div", "toast"); let tt;
@@ -383,8 +416,8 @@
     '<button data-k="qr">체크인 QR (C)</button><button data-k="intro" class="on">소개 모드 (1)</button><button data-k="qa">질문 모드 (2)</button>' +
     '<button data-k="rand">랜덤 뽑기 (R)</button><button data-k="fs">전체화면 (F)</button><span class="st"></span>';
   const stat = bar.querySelector(".st");
-  bar.querySelectorAll("button").forEach(b => b.onclick = e => { e.stopPropagation(); act(b.dataset.k); });
-  function setMode(m) { mode = m; clearSel(); bar.querySelector('[data-k=intro]').classList.toggle("on", m === "intro"); bar.querySelector('[data-k=qa]').classList.toggle("on", m === "qa"); qlist.classList.toggle("hidden", m !== "qa"); renderQuestions(); updateLed(); }
+  bar.querySelectorAll("button").forEach(b => { b.tabIndex = -1; b.onclick = e => { e.stopPropagation(); b.blur(); act(b.dataset.k); }; });
+  function setMode(m) { stopRoll(); mode = m; clearSel(); bar.querySelector('[data-k=intro]').classList.toggle("on", m === "intro"); bar.querySelector('[data-k=qa]').classList.toggle("on", m === "qa"); qlist.classList.toggle("hidden", m !== "qa"); renderQuestions(); updateLed(); }
   let qrEl = null;
   function toggleQR() {
     if (qrEl) { qrEl.remove(); qrEl = null; return; }
@@ -401,8 +434,8 @@
     else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
   }
   document.addEventListener("keydown", e => {
-    if (e.key === "Escape") { if (qrEl) toggleQR(); else clearSel(); }
-    else if (e.key === "Enter") { const b = card.querySelector('[data-a=done]'); if (b && !card.classList.contains("hidden")) b.click(); }
+    if (e.key === "Escape") { if (qrEl) toggleQR(); else { stopRoll(); clearSel(); } }
+    else if (e.key === "Enter") { e.preventDefault(); const b = card.querySelector('[data-a=done]'); if (b && !card.classList.contains("hidden")) b.click(); }
     else ({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs" })[e.key.toLowerCase()] && act(({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs" })[e.key.toLowerCase()]);
   });
   let hideT; document.addEventListener("mousemove", () => { bar.classList.add("show"); clearTimeout(hideT); hideT = setTimeout(() => bar.classList.remove("show"), 2500); });
@@ -416,14 +449,17 @@
         const p = people.get(e.cid);
         if (!p) addPerson(e, !first);
         else {
+          // 늦게 도착한 옛 카드가 새 카드를 덮지 않게: 휴대폰에서 보낸 시각이 더 최신일 때만 반영
+          if (e.ts && p.ts && String(e.ts) < String(p.ts)) return;
+          if (e.ts) p.ts = e.ts;
           const before = JSON.stringify([p.name].concat(FIELDS.map(k => p[k])));
-          FIELDS.forEach(k => p[k] = e[k] || ""); if (e.name) { p.name = e.name; p.el.querySelector(".nm").textContent = p.name; }
+          FIELDS.forEach(k => p[k] = e[k] || ""); if (e.name) { p.name = e.name; p.el.querySelector(".nm").textContent = shortName(p.name); }
           if (before !== JSON.stringify([p.name].concat(FIELDS.map(k => p[k])))) { paintAgent(p); edited.add(p); }
         }
       } else if (e.kind === "ask") { if (addAsk(e)) newAsk = true; }
     });
     if (newAsk && !first && mode === "qa") toast("💬 새 질문이 올라왔어요");
-    if (!first) edited.forEach(p => { if (p.el.style.visibility === "hidden") return; toast("✏️ " + p.name + " 님이 체크인 카드를 고쳤어요"); p.el.classList.remove("pop"); void p.el.offsetWidth; p.el.classList.add("pop"); setTimeout(() => p.el.classList.remove("pop"), 800); if (selected === p) select(p); });
+    if (!first) edited.forEach(p => { if (p.el.style.visibility === "hidden" || mod.hidden[p.cid]) return; toast("✏️ " + p.name + " 님이 체크인 카드를 고쳤어요"); p.el.classList.remove("pop"); void p.el.offsetWidth; p.el.classList.add("pop"); setTimeout(() => p.el.classList.remove("pop"), 800); if (selected === p) select(p); });
     first = false; runQueue(); renderQuestions(); updateLed();
   }
 
@@ -452,6 +488,8 @@
     K.listen(sync, CFG.pollMs);
   }
   updateLed();
+  // 시뮬레이션·점검용 읽기 전용 창구
+  window.__kn = { people, asks, queue, walkers, mod, get mode() { return mode; }, get selected() { return selected; }, card, qlist, world };
 })();
 </script>
 </body>

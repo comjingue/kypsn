@@ -162,8 +162,8 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=4"></script>
-<script src="night.js?v=4"></script>
+<script src="config.js?v=5"></script>
+<script src="night.js?v=5"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -171,6 +171,7 @@
   const ME_KEY = "kypsn-night-me", ASK_KEY = "kypsn-night-myasks";
   const get = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
   const set = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  let memMe = null;   // 저장소가 막힌 브라우저 대비
   if (!K.LIVE) $("modeBadge").classList.remove("hidden");
 
   // ── 호텔 외관 ──
@@ -209,7 +210,7 @@
 
   // ── 체크인 ──
   const pv = $("pv");
-  function pvDraw() { K.draw(pv, ($("iName").value || "KYPSN").trim(), 4, 0, typeof picks !== "undefined" ? K.look(picks.pos.join(""), picks.sex.join("")) : null); }
+  function pvDraw() { K.draw(pv, ($("iName").value || "KYPSN").trim() + "|" + K.myId(), 4, 0, typeof picks !== "undefined" ? K.look(picks.pos.join(""), picks.sex.join("")) : null); }
   $("iName").addEventListener("input", pvDraw); pvDraw();
 
   // 고르기 칩
@@ -240,28 +241,30 @@
     e.preventDefault();
     const me = { kind: "intro", cid: K.myId(), name: $("iName").value.trim(), role: $("iRole").value.trim(), question: $("iQuestion").value.trim(), meet: $("iMeet").value.trim(), ifnot: $("iIfnot").value.trim(),
       sex: picks.sex.join(""), pos: picks.pos.join(", "), interest: picks.interest.join(", "), future: picks.future.join(", "), mbti: picks.mbti.join(", ") };
-    if (!me.name || !me.role) return;
-    $("bIn").disabled = true;
-    try { await K.submit(me); } catch (err) { $("bIn").disabled = false; toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
-    const first = !get(ME_KEY, null);
-    set(ME_KEY, me);
+    if (!me.name || !me.role) { toast("이름과 소속·전공을 써 주세요"); return; }
+    if ($("bIn").disabled) return;
+    $("bIn").disabled = true; const label = $("bIn").textContent; $("bIn").textContent = "보내는 중…";
+    try { await K.submit(me); } catch (err) { $("bIn").disabled = false; $("bIn").textContent = label; toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
+    $("bIn").textContent = label;
+    const first = !(get(ME_KEY, null) || memMe);
+    set(ME_KEY, me); memMe = me;
     $("bIn").disabled = false;
     if (first) ride(me); else { showRoom(me); toast("체크인 카드를 고쳤어요"); }
   });
 
   function ride(me) {
     $("checkin").classList.add("hidden"); $("lift").classList.remove("hidden");
-    K.draw($("liftMe"), me.name, 6, 0, K.look(me.pos, me.sex));
+    K.draw($("liftMe"), me.name + "|" + me.cid, 6, 0, K.look(me.pos, me.sex));
     window.scrollTo({ top: 0, behavior: "smooth" });
     let f = 1; const t = setInterval(() => {
       f++; $("floorNo").textContent = f + "F";
-      if (f >= 14) { clearInterval(t); $("shaft").classList.add("open"); setTimeout(() => $("welcome").classList.remove("hidden"), 1200); setTimeout(() => { if ($("room").classList.contains("hidden")) showRoom(get(ME_KEY, me)); }, 3600); }
+      if (f >= 14) { clearInterval(t); $("shaft").classList.add("open"); setTimeout(() => $("welcome").classList.remove("hidden"), 1200); setTimeout(() => { if ($("room").classList.contains("hidden")) showRoom(memMe || get(ME_KEY, me)); }, 3600); }
     }, 170);
   }
 
   function showRoom(me) {
     $("checkin").classList.add("hidden"); $("lift").classList.add("hidden"); $("room").classList.remove("hidden");
-    K.draw($("keyMe"), me.name, 4, 0, K.look(me.pos, me.sex)); $("kName").textContent = me.name; $("kRole").textContent = me.role;
+    K.draw($("keyMe"), me.name + "|" + me.cid, 4, 0, K.look(me.pos, me.sex)); $("kName").textContent = me.name; $("kRole").textContent = me.role;
     renderMine();
   }
 
@@ -275,18 +278,20 @@
 
   $("fAsk").addEventListener("submit", async e => {
     e.preventDefault();
-    const me = get(ME_KEY, null); const text = $("iAsk").value.trim(); if (!me || !text) return;
+    const me = get(ME_KEY, null) || memMe; const text = $("iAsk").value.trim(); if (!me || !text) { if (!text) toast("질문을 써 주세요"); return; }
+    const btn = e.target.querySelector("button[type=submit]"); if (btn.disabled) return; btn.disabled = true;
     const a = { kind: "ask", cid: K.myId(), name: me.name, target, ask: text };
-    try { await K.submit(a); } catch (err) { toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
+    try { await K.submit(a); } catch (err) { btn.disabled = false; toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
+    btn.disabled = false;
     const list = get(ASK_KEY, []); list.push(a); set(ASK_KEY, list);
     $("iAsk").value = ""; renderMine(); toast("질문이 무대로 올라갔어요");
   });
 
-  $("bEdit").onclick = () => { fillForm(get(ME_KEY, {})); $("room").classList.add("hidden"); $("checkin").classList.remove("hidden"); $("bIn").textContent = "고친 내용 보내기"; };
+  $("bEdit").onclick = () => { fillForm(memMe || get(ME_KEY, {})); $("room").classList.add("hidden"); $("checkin").classList.remove("hidden"); $("bIn").textContent = "고친 내용 보내기"; };
   if (CFG.openChat) { const a = $("openChat"); a.href = CFG.openChat; a.classList.remove("hidden"); }
 
   const saved = get(ME_KEY, null);
-  if (saved) showRoom(saved);
+  if (saved) { memMe = saved; showRoom(saved); }
 })();
 </script>
 </body>

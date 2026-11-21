@@ -7,7 +7,11 @@
   CFG.joinLink = CFG.joinUrl + (TOPIC_Q ? "?topic=" + encodeURIComponent(TOPIC_Q) : "");
   const NTFY = !!CFG.ntfyTopic;
   const LIVE = NTFY || !!(CFG.formAction && CFG.sheetId);
-  const NTFY_URL = "https://ntfy.sh/" + (CFG.ntfyTopic || "");
+  // 시뮬레이션용: 이 PC 안의 가짜 중계 서버만 허용
+  const BASE_Q = new URLSearchParams(location.search).get("ntfybase");
+  const NTFY_BASE = BASE_Q && /^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(BASE_Q) ? BASE_Q : "https://ntfy.sh";
+  const NTFY_URL = NTFY_BASE + "/" + (CFG.ntfyTopic || "");
+  if (BASE_Q) CFG.joinLink += (CFG.joinLink.indexOf("?") < 0 ? "?" : "&") + "ntfybase=" + encodeURIComponent(BASE_Q);
   const LS_KEY = "kypsn-night-entries";
 
   // ── 결정적 난수 ─────────────────────────────────────────
@@ -114,8 +118,19 @@
   async function submit(entry) {
     entry.ts = entry.ts || new Date().toISOString();
     if (!LIVE) { localAdd(entry); return true; }
-    if (NTFY) { const bytes = new TextEncoder().encode(JSON.stringify(entry)); let bin = ""; bytes.forEach(b => bin += String.fromCharCode(b));
-      const r = await fetch(NTFY_URL, { method: "POST", body: "KN2:" + btoa(bin) }); if (!r.ok) throw new Error("ntfy " + r.status); return true; }
+    if (NTFY) {
+      const bytes = new TextEncoder().encode(JSON.stringify(entry)); let bin = ""; bytes.forEach(b => bin += String.fromCharCode(b));
+      const body = "KN2:" + btoa(bin);
+      // 붐빌 때(429)·끊길 때를 대비해 4번까지 다시 보낸다
+      let last;
+      for (let i = 0; i < 4; i++) {
+        if (i) await new Promise(r => setTimeout(r, 800 * Math.pow(2, i - 1) + Math.random() * 400));
+        const ac = typeof AbortController !== "undefined" ? new AbortController() : null; const to = ac ? setTimeout(() => ac.abort(), 8000) : 0;
+        try { const r = await fetch(NTFY_URL, { method: "POST", body, signal: ac ? ac.signal : undefined }); clearTimeout(to); if (r.ok) return true; last = new Error("ntfy " + r.status); if (r.status < 500 && r.status !== 429) break; }
+        catch (x) { clearTimeout(to); last = x; }
+      }
+      throw last || new Error("ntfy");
+    }
     const body = new URLSearchParams();
     Object.keys(CFG.entries).forEach(k => { if (CFG.entries[k] && entry[k] != null) body.append("entry." + CFG.entries[k], entry[k]); });
     await fetch(CFG.formAction, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() });
@@ -169,22 +184,29 @@
       let ch = false; txt.split("\n").forEach(l => { if (l.trim()) { try { if (add(JSON.parse(l))) ch = true; } catch (x) {} } });
       return ch;
     }
+    let pollT = null, errs = 0;
+    const tick = () => poll().then(ch => { if (ch) emit(); }).catch(() => {});
+    function pollMode() { if (es) { es.close(); es = null; } if (!pollT) pollT = setInterval(tick, pollMs || 4000); window.__knMode = "poll"; }
     function stream() {
       if (es) es.close();
       es = new EventSource(NTFY_URL + "/sse?since=" + lastId);
+      window.__knMode = "sse";
+      es.onopen = () => { errs = 0; tick(); };
       es.onmessage = ev => { try { if (add(JSON.parse(ev.data))) emit(); } catch (x) {} };
-      es.onerror = () => { window.__knErr = (window.__knErr || 0) + 1; };
+      // 실시간 연결이 계속 끊기면(행사장 네트워크가 막는 경우) 4초 간격 확인으로 바꾼다
+      es.onerror = () => { errs++; window.__knErr = (window.__knErr || 0) + 1; if (es && (es.readyState === 2 || errs >= 3)) pollMode(); };
     }
-    if (new URLSearchParams(location.search).has("poll")) { poll().then(emit).catch(() => emit()); setInterval(() => { poll().then(ch => { if (ch) emit(); }).catch(() => {}); }, pollMs || 5000); return; }
+    if (new URLSearchParams(location.search).has("poll")) { poll().then(emit).catch(() => emit()); pollMode(); return; }
     poll().then(emit).catch(() => emit()).finally(stream);
-    // 안전망: 1분마다 빠진 것 채우기
-    setInterval(() => { poll().then(ch => { if (ch) emit(); }).catch(() => {}); }, 60000);
+    // 안전망: 20초마다 빠진 것 채우기
+    setInterval(() => { if (!pollT) tick(); }, 20000);
   }
 
+  let memId = null;   // 저장소가 막힌 브라우저(사생활 모드)에서도 같은 사람으로 남게
   function myId() {
-    let id = null; try { id = localStorage.getItem("kypsn-night-cid"); } catch (e) {}
+    let id = memId; try { id = id || localStorage.getItem("kypsn-night-cid"); } catch (e) {}
     if (!id) { id = "p" + Math.random().toString(36).slice(2, 10); try { localStorage.setItem("kypsn-night-cid", id); } catch (e) {} }
-    return id;
+    memId = id; return id;
   }
 
   window.KNight = { draw, paint, look, spec, hash, rng, submit, fetchAll, listen, myId, LIVE, NTFY, LS_KEY, CFG };
