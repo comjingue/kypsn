@@ -46,8 +46,9 @@
     short: { 1: ".....HHHHHH.....", 2: "....HHHHHHHH....", 3: "....HHHHHHHH....", 4: "....HSSSSSSH...." },
     side:  { 1: "......HHHHH.....", 2: "....HHHHHHHH....", 3: "....HHHHHHHH....", 4: "....HHSSSSSS...." },
     long:  { 1: ".....HHHHHH.....", 2: "....HHHHHHHH....", 3: "...HHHHHHHHHH...", 4: "...HHSSSSSSHH...", 5: "...HSSESSESSH...", 6: "...HSSSSSSSSH...", 7: "...HHSSMMSSHH...", 8: "...HH.SSSS.HH..." },
-    bun:   { 0: ".......HH.......", 1: ".....HHHHHH.....", 2: "....HHHHHHHH....", 3: "....HHHHHHHH....", 4: "....HSSSSSSH...." },
+    bun:   { 0: ".......HH.......", 1: ".....HHHHHH.....", 2: "....HHHHHHHH....", 3: "...HHHHHHHHHH...", 4: "...HHSSSSSSHH...", 5: "...H........H...", 6: "...H........H..." },
     cap:   { 1: ".....KKKKKK.....", 2: "....KKKKKKKK....", 3: "....KKKKKKKKKK..", 4: "....HSSSSSSH...." },
+    bob:   { 1: ".....HHHHHH.....", 2: "....HHHHHHHH....", 3: "...HHHHHHHHHH...", 4: "...HHSSSSSSHH...", 5: "...HSSESSESSH...", 6: "...HSSSSSSSSH...", 7: "...HH......HH...", 8: "....H......H...." },
     curly: { 1: "....H.HHHH.H....", 2: "...HHHHHHHHHH...", 3: "...HHHHHHHHHH...", 4: "....HSSSSSSH...." }
   };
   const SKIN = ["#F6D3B3", "#EDBE98", "#D9A27A", "#F1C9A6", "#C88F68"];
@@ -57,21 +58,32 @@
   const CAPC = ["#1B2A5E", "#B8912A", "#C25B4E", "#3FA796"];
 
   // 직위에 따라 옷: 임상의는 가운, 산업계는 정장
-  function look(pos) { pos = String(pos || ""); if (/전공의|전임의|전문의|교수/.test(pos)) return { coat: true }; if (/산업계|창업/.test(pos)) return { coat: false, shirt: "#2B2F45", tie: true }; if (/의대생|대학원생/.test(pos)) return { coat: false }; return null; }
+  function look(pos, sex) { pos = String(pos || ""); let o = null; if (/전공의|전임의|전문의|교수/.test(pos)) o = { coat: true }; else if (/산업계|창업/.test(pos)) o = { coat: false, shirt: "#2B2F45", tie: !/여/.test(sex || "") }; else if (/의대생|대학원생/.test(pos)) o = { coat: false }; if (sex === "남" || sex === "여") { o = o || {}; o.sex = sex; } return o; }
   function spec(key, over) {
     const r = rng(hash(String(key || "kypsn")));
     const pick = a => a[Math.floor(r() * a.length)];
     return { hair: pick(Object.keys(HAIR)), skin: pick(SKIN), hairC: pick(HAIRC), shirt: pick(SHIRT), pants: pick(PANTS), cap: pick(CAPC), coat: r() < 0.35, glasses: r() < 0.3, tie: false };
   }
-  function specOf(key, over) { return Object.assign(spec0(key), over || {}); }
+  const HAIR_M = ["short", "side", "cap", "curly"], HAIR_F = ["long", "bun", "bob"];
+  function specOf(key, over) {
+    const sp = Object.assign(spec0(key), over || {});
+    if (sp.sex) { const set = sp.sex === "여" ? HAIR_F : HAIR_M; sp.hair = set[hash(String(key) + "#hair") % set.length]; sp.blush = sp.sex === "여"; }
+    else if (HAIR_F.includes(sp.hair)) sp.blush = true;
+    return sp;
+  }
   function spec0(key) { return spec(key);
   }
   function grid(sp, frame) {
     const g = BODY.map(s => s.split(""));
     const w = WALK[frame || 0];
     if (w) Object.keys(w).forEach(k => { g[k] = w[k].split(""); });
+    if (sp.blush) { // 여성: 치마 + 다리
+      const L = [".....SS..SS.....", "....SS...SS.....", ".....SS...SS...."][frame || 0];
+      g[14] = "....PPPPPPPP....".split(""); g[15] = "...PPPPPPPPPP...".split(""); g[16] = L.split(""); g[17] = L.replace(/S/g, "B").split("");
+    }
     const h = HAIR[sp.hair];
     Object.keys(h).forEach(k => { h[k].split("").forEach((ch, i) => { if (ch !== ".") g[k][i] = ch; else if (+k <= 2) g[k][i] = "."; }); });
+    if (sp.blush && sp.hair !== "cap") { g[1][11] = "R"; g[2][11] = "R"; g[2][12] = "R"; }
     if (sp.coat) { [9, 10, 11, 12, 13].forEach(r => { g[r].forEach((ch, i) => { if (ch === "C" && (i <= 5 || i >= 10)) g[r][i] = "W"; }); }); }
     if (sp.glasses) { const row = g[5]; [5, 6, 7, 8, 9, 10].forEach(i => { if (row[i] === "S") row[i] = "G"; }); }
     return g;
@@ -80,9 +92,10 @@
   function paint(ctx, key, ox, oy, s, frame, over) {
     const sp = specOf(key, over), g = grid(sp, frame);
     s = s || 1;
-    const col = { S: sp.skin, H: sp.hairC, E: "#1B1B22", M: "#B5524A", C: sp.shirt, W: "#F4F6FA", P: sp.pants, B: "#1E1E24", K: sp.cap, G: "#1B1B22" };
+    const col = { S: sp.skin, H: sp.hairC, E: "#1B1B22", M: "#B5524A", C: sp.shirt, W: "#F4F6FA", P: sp.pants, B: "#1E1E24", K: sp.cap, G: "#1B1B22", R: "#E0507A" };
     g.forEach((row, y) => row.forEach((ch, x) => { if (ch !== "." && col[ch]) { ctx.fillStyle = col[ch]; ctx.fillRect(ox + x * s, oy + y * s, s, s); } }));
     if (sp.coat) { ctx.fillStyle = "#C9D1E0"; ctx.fillRect(ox + 7 * s, oy + 10 * s, Math.max(1, s / 2), 4 * s); }
+    if (sp.blush) { ctx.fillStyle = "#EE9A92"; ctx.fillRect(ox + 5 * s, oy + 6 * s, s, s); ctx.fillRect(ox + 10 * s, oy + 6 * s, s, s); }
     if (sp.tie) { ctx.fillStyle = "#F4F6FA"; ctx.fillRect(ox + 7 * s, oy + 9 * s, 2 * s, s); ctx.fillStyle = "#C25B4E"; ctx.fillRect(ox + 7 * s, oy + 10 * s, 2 * s, 3 * s); }
   }
   function draw(canvas, key, scale, frame, over) {

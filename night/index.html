@@ -92,6 +92,8 @@
     <form id="fIntro" autocomplete="off">
       <label>이름 <small>(필수)</small></label>
       <input id="iName" maxlength="20" required placeholder="홍길동">
+      <label>성별 <small>(캐릭터 모습이 바뀝니다)</small></label>
+      <div class="targets" data-pick="sex" data-one="1"></div>
       <label>소속 · 전공 한 줄 <small>(필수)</small></label>
       <input id="iRole" maxlength="40" required placeholder="예: OO대병원 정형외과 · 의공학 박사과정">
       <label>지금 나는</label>
@@ -207,17 +209,18 @@
 
   // ── 체크인 ──
   const pv = $("pv");
-  function pvDraw() { K.draw(pv, ($("iName").value || "KYPSN").trim(), 4, 0, K.look(typeof picks !== "undefined" ? picks.pos.join("") : "")); }
+  function pvDraw() { K.draw(pv, ($("iName").value || "KYPSN").trim(), 4, 0, typeof picks !== "undefined" ? K.look(picks.pos.join(""), picks.sex.join("")) : null); }
   $("iName").addEventListener("input", pvDraw); pvDraw();
 
   // 고르기 칩
   const OPTS = {
+    sex: ["남", "여"],
     pos: ["의대생", "전공의", "전임의", "전문의·교수", "대학원생", "산업계·창업"],
     interest: ["연구", "창업", "산업계", "AI·디지털", "의료기기", "신약·바이오", "정책·제도", "투자·금융"],
     future: ["연구하는 임상의", "교수", "창업가", "산업계 리더", "투자자", "아직 탐색 중"],
     mbti: ["INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP", "몰라요"]
   };
-  var picks = { pos: [], interest: [], future: [], mbti: [] };
+  var picks = { sex: [], pos: [], interest: [], future: [], mbti: [] };
   document.querySelectorAll("[data-pick]").forEach(box => {
     const k = box.dataset.pick, one = !!box.dataset.one;
     OPTS[k].forEach(v => { const b = document.createElement("button"); b.type = "button"; b.textContent = v;
@@ -236,7 +239,7 @@
   $("fIntro").addEventListener("submit", async e => {
     e.preventDefault();
     const me = { kind: "intro", cid: K.myId(), name: $("iName").value.trim(), role: $("iRole").value.trim(), question: $("iQuestion").value.trim(), meet: $("iMeet").value.trim(), ifnot: $("iIfnot").value.trim(),
-      pos: picks.pos.join(", "), interest: picks.interest.join(", "), future: picks.future.join(", "), mbti: picks.mbti.join(", ") };
+      sex: picks.sex.join(""), pos: picks.pos.join(", "), interest: picks.interest.join(", "), future: picks.future.join(", "), mbti: picks.mbti.join(", ") };
     if (!me.name || !me.role) return;
     $("bIn").disabled = true;
     try { await K.submit(me); } catch (err) { $("bIn").disabled = false; toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
@@ -248,7 +251,7 @@
 
   function ride(me) {
     $("checkin").classList.add("hidden"); $("lift").classList.remove("hidden");
-    K.draw($("liftMe"), me.name, 6, 0, K.look(me.pos));
+    K.draw($("liftMe"), me.name, 6, 0, K.look(me.pos, me.sex));
     window.scrollTo({ top: 0, behavior: "smooth" });
     let f = 1; const t = setInterval(() => {
       f++; $("floorNo").textContent = f + "F";
@@ -258,7 +261,7 @@
 
   function showRoom(me) {
     $("checkin").classList.add("hidden"); $("lift").classList.add("hidden"); $("room").classList.remove("hidden");
-    K.draw($("keyMe"), me.name, 4, 0, K.look(me.pos)); $("kName").textContent = me.name; $("kRole").textContent = me.role;
+    K.draw($("keyMe"), me.name, 4, 0, K.look(me.pos, me.sex)); $("kName").textContent = me.name; $("kRole").textContent = me.role;
     renderMine();
   }
 

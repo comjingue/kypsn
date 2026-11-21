@@ -229,8 +229,9 @@
   const mod = (() => { try { return JSON.parse(localStorage.getItem(STK)) || {}; } catch (e) { return {}; } })();
   mod.hidden = mod.hidden || {}; mod.done = mod.done || {}; mod.qdone = mod.qdone || {};
   const saveMod = () => { try { localStorage.setItem(STK, JSON.stringify(mod)); } catch (e) {} };
-  const FIELDS = ["role", "pos", "interest", "future", "mbti", "question", "meet", "ifnot"];
-  const people = new Map();   // cid → person
+  const FIELDS = ["sex", "role", "pos", "interest", "future", "mbti", "question", "meet", "ifnot"];
+  const people = new Map();
+  const lookOf = cid => { const p = people.get(cid); return p ? K.look(p.pos, p.sex) : null; };   // cid → person
   const asks = new Map();     // key → ask
   let seatN = 0, first = true, mode = "intro", selected = null;
   const queue = [];
@@ -244,7 +245,7 @@
     p.el = el; p.cv = c; p.frame = 0; paintAgent(p);
     return el;
   }
-  function paintAgent(p) { const x = p.cv.getContext("2d"); x.clearRect(0, 0, 16, 20); K.paint(x, p.name, 0, 0, 1, p.frame, K.look(p.pos)); }
+  function paintAgent(p) { const x = p.cv.getContext("2d"); x.clearRect(0, 0, 16, 20); K.paint(x, p.name, 0, 0, 1, p.frame, K.look(p.pos, p.sex)); }
   function setPos(p, x, y) { p.x = x; p.y = y; place(p.el, x - 8, y - 20, 16, 20); p.el.style.zIndex = 100 + Math.round(y); }
 
   function addPerson(e, animate) {
@@ -305,7 +306,7 @@
     const list = [...asks.values()].filter(a => !mod.hidden[a.cid]).sort((a, b) => (mod.qdone[a.key] ? 1 : 0) - (mod.qdone[b.key] ? 1 : 0) || String(b.ts).localeCompare(String(a.ts)));
     qlist.innerHTML = "<h3>질문 " + list.length + "개 · 눌러서 크게 보기</h3>";
     list.forEach(a => {
-      const it = mk("div", "qitem" + (mod.qdone[a.key] ? " done" : ""), qlist); const c = mk("canvas", "", it); K.draw(c, a.name, 2);
+      const it = mk("div", "qitem" + (mod.qdone[a.key] ? " done" : ""), qlist); const c = mk("canvas", "", it); K.draw(c, a.name, 2, 0, lookOf(a.cid));
       const tx = mk("div", "", it); tx.innerHTML = '<div class="tg"></div><div class="tx"></div>'; tx.firstChild.textContent = a.name + " → " + a.target; tx.lastChild.textContent = a.ask;
       it.onclick = () => showAsk(a);
     });
@@ -331,7 +332,7 @@
       row("요즘 진로 고민", p.question) +
       '<div class="two">' + row("오늘 만나고 싶은 사람", p.meet) + row("의사가 안 됐다면", p.ifnot) + "</div>" +
       '<div class="btns"><button class="pri" data-a="done">소개 끝 ★ (Enter)</button><button data-a="close">닫기 (Esc)</button><button data-a="hide">화면에서 숨기기</button></div>';
-    K.draw(card.querySelector("canvas"), p.name, 8, 0, K.look(p.pos));
+    K.draw(card.querySelector("canvas"), p.name, 8, 0, K.look(p.pos, p.sex));
     card.querySelector('[data-a=done]').onclick = () => { mod.done[p.cid] = 1; saveMod(); p.el.classList.add("done"); clearSel(); updateLed(); };
     card.querySelector('[data-a=close]').onclick = clearSel;
     card.querySelector('[data-a=hide]').onclick = () => { mod.hidden[p.cid] = 1; saveMod(); p.el.classList.add("hidden"); clearSel(); updateLed(); };
@@ -341,7 +342,7 @@
     clearSel(); const p = people.get(a.cid); if (p) spotOn(p);
     card.innerHTML = '<div class="top"><canvas></canvas><div><div class="lab px">QUESTION</div><div class="nm"></div><div class="rl"></div></div></div><div class="q"></div>' +
       '<div class="btns"><button class="pri" data-a="done">답변 끝 (Enter)</button><button data-a="close">닫기 (Esc)</button></div>';
-    K.draw(card.querySelector("canvas"), a.name, 8);
+    K.draw(card.querySelector("canvas"), a.name, 8, 0, lookOf(a.cid));
     card.querySelector(".nm").textContent = a.name; card.querySelector(".rl").textContent = "→ " + a.target; card.querySelector(".q").textContent = a.ask;
     card.querySelector('[data-a=done]').onclick = () => { mod.qdone[a.key] = 1; saveMod(); clearSel(); renderQuestions(); updateLed(); };
     card.querySelector('[data-a=close]').onclick = clearSel;
@@ -430,7 +431,8 @@
     const TG = CFG.targets || ["패널 전체"];
     const demo = []; let n = 0, t0 = Date.now();
     const POS = ["전공의", "전문의·교수", "의대생", "전공의", "전임의", "산업계·창업", "대학원생", "전문의·교수"], INT = ["연구, AI·디지털", "의료기기, 창업", "창업, 투자·금융", "AI·디지털", "연구, 의료기기", "창업, 산업계", "신약·바이오, 연구", "정책·제도"], FUT = ["창업가", "연구하는 임상의", "아직 탐색 중", "교수", "창업가", "산업계 리더", "투자자"], MB = ["ENTJ", "INTP", "ENFP", "ISTJ", "ENTJ", "INFJ", "몰라요", "ESTP", "ENTJ"], IFN = ["셰프", "", "건축가", "프로게이머", "", "기자"];
-    const mkIntro = i => ({ kind: "intro", cid: "demo" + i, name: NAMES[i % NAMES.length], role: ROLES[i % ROLES.length], pos: POS[i % POS.length], interest: INT[i % INT.length], future: FUT[i % FUT.length], mbti: MB[i % MB.length], ifnot: IFN[i % IFN.length], question: QS[i % QS.length], meet: MEETS[i % MEETS.length], ts: new Date(t0 + i * 1000).toISOString() });
+    const SEX = ["여", "남", "남", "여", "남", "여", "남", "여", "여", "남", "여", "남", "남", "여", "남", "여", "남", "여", "남", "여"];
+    const mkIntro = i => ({ kind: "intro", cid: "demo" + i, sex: SEX[i % SEX.length], name: NAMES[i % NAMES.length], role: ROLES[i % ROLES.length], pos: POS[i % POS.length], interest: INT[i % INT.length], future: FUT[i % FUT.length], mbti: MB[i % MB.length], ifnot: IFN[i % IFN.length], question: QS[i % QS.length], meet: MEETS[i % MEETS.length], ts: new Date(t0 + i * 1000).toISOString() });
     for (; n < 14; n++) demo.push(mkIntro(n));
     [1, 4, 7].forEach((i, j) => demo.push({ kind: "ask", cid: "demo" + i, name: NAMES[i], target: TG[j % TG.length], ask: ASKS[j], ts: new Date(t0 + 50000 + j).toISOString() }));
     sync(demo.slice());
