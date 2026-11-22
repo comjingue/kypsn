@@ -65,12 +65,30 @@
     // 브러시: 2·4박 강조 + 스윙 8분
     for (let k = 0; k < 4; k++) { brush(t + k * BEAT, k % 2 ? 0.05 : 0.03, 0.12); brush(t + (k + 0.66) * BEAT, 0.018, 0.06); }
   }
+  // 아이폰은 무음 스위치가 켜져 있으면 Web Audio 소리를 막는다.
+  // 미디어 재생으로 분류되게 바꾸고(Safari 17+), 예전 기종은 무음 오디오를 같이 틀어 미디어 채널을 연다
+  let unlocked = false;
+  function unlockMobile() {
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+    if (unlocked) return; unlocked = true;
+    try {
+      const sr = 8000, n = sr / 2, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+      const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+      w(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); w(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+      v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, n * 2, true);
+      const a = new Audio(URL.createObjectURL(new Blob([buf], { type: "audio/wav" })));
+      a.loop = true; a.setAttribute("playsinline", ""); a.volume = 0.01; const p = a.play(); if (p && p.catch) p.catch(() => {});
+    } catch (e) {}
+  }
+  // 화면을 다시 켜면(휴대폰 잠금 해제 등) 멈춘 소리를 되살린다
+  document.addEventListener("visibilitychange", () => { if (ctx && playing && document.visibilityState === "visible") ctx.resume(); });
   function loop() {
     while (nextBar < ctx.currentTime + 1.2) { scheduleBar(nextBar, barNo++); nextBar += BEAT * 4; }
   }
   const api = {
     get on() { return playing; },
     start() {
+      unlockMobile();
       init(); ctx.resume(); if (playing) return; playing = true;
       nextBar = ctx.currentTime + 0.1; master.gain.cancelScheduledValues(ctx.currentTime);
       master.gain.setValueAtTime(master.gain.value, ctx.currentTime); master.gain.linearRampToValueAtTime(api.volume, ctx.currentTime + 2);
