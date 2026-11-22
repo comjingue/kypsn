@@ -82,7 +82,7 @@
   .card .btns button { flex: 1; font: inherit; font-size: 1.1cqw; font-weight: 900; padding: .8cqw; border-radius: .4cqw; border: .15cqw solid #2C3866; background: #0B1228; color: var(--ink); cursor: pointer; }
   .card .btns button.pri { background: var(--gold); color: #1A1406; border-color: var(--gold); }
 
-  .qlist { position: absolute; left: 1.2cqw; top: 1.2cqw; bottom: 5.4cqw; width: 26cqw; background: rgba(8,12,28,.9); border: .15cqw solid #2C3866; border-radius: .6cqw; padding: 1cqw; z-index: 960; overflow-y: auto; }
+  .qlist { position: absolute; left: 1.2cqw; top: 1.2cqw; bottom: 5.6cqw; width: 26cqw; background: rgba(8,12,28,.9); border: .15cqw solid #2C3866; border-radius: .6cqw; padding: 1cqw; z-index: 960; overflow-y: auto; }
   .qf { display: flex; flex-wrap: wrap; gap: .4cqw; margin-bottom: .8cqw; }
   .qf button { font: inherit; font-size: .85cqw; font-weight: 700; color: #C9D3F0; background: #0B1228; border: .12cqw solid #2C3866; border-radius: 1cqw; padding: .25cqw .7cqw; cursor: pointer; }
   .qf button.on { color: #1A1406; background: var(--gold); border-color: var(--gold); }
@@ -110,6 +110,19 @@
   .qr .tx h2 { font-size: 3.6cqw; margin: 1.2cqw 0 .6cqw; font-weight: 900; }
   .qr .tx p { font-size: 1.8cqw; color: #C9D3F0; margin: 0; line-height: 1.5; }
   .qr .tx .url { font-size: 2.2cqw; color: #fff; font-weight: 900; margin-top: 1.4cqw; }
+  /* 재즈 상자 (왼쪽 아래, 늘 보임) */
+  .juke { position: absolute; left: 1.2cqw; bottom: 1.2cqw; z-index: 1100; display: flex; align-items: center; gap: .6cqw; background: rgba(8,12,28,.9); border: .15cqw solid #C8A45A; border-radius: .5cqw; padding: .45cqw .7cqw; box-shadow: 0 .3cqw 0 rgba(0,0,0,.4); user-select: none; }
+  .juke .eq { display: flex; align-items: flex-end; gap: .15cqw; height: 1.6cqw; width: 1.9cqw; }
+  .juke .eq i { flex: 1; background: #E2B857; height: 20%; border-radius: .1cqw; }
+  .juke.on .eq i { animation: eq .9s ease-in-out infinite alternate; }
+  .juke.on .eq i:nth-child(2) { animation-delay: -.3s; animation-duration: .7s; } .juke.on .eq i:nth-child(3) { animation-delay: -.6s; animation-duration: 1.1s; } .juke.on .eq i:nth-child(4) { animation-delay: -.15s; animation-duration: .8s; }
+  @keyframes eq { from { height: 15%; } to { height: 100%; } }
+  .juke .tt { line-height: 1.15; }
+  .juke .tt b { display: block; font-family: "Press Start 2P", monospace; font-size: .62cqw; color: var(--gold); letter-spacing: .03em; }
+  .juke .tt span { font-size: .78cqw; color: #C9D3F0; }
+  .juke button { font: inherit; cursor: pointer; border: .12cqw solid #2C3866; background: #0B1228; color: var(--ink); border-radius: .35cqw; height: 2cqw; min-width: 2cqw; padding: 0 .4cqw; font-size: .95cqw; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+  .juke button.play { background: var(--gold); color: #1A1406; border-color: var(--gold); min-width: 2.6cqw; }
+  .juke .vol { font-size: .75cqw; color: #9AA6CC; min-width: 2.4cqw; text-align: center; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -121,7 +134,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="../config.js?v=7"></script>
 <script src="../night.js?v=7"></script>
-<script src="../jazz.js?v=7"></script>
+<script src="../jazz.js?v=8"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -447,6 +460,15 @@
     '<button data-k="qr">체크인 QR (C)</button><button data-k="intro" class="on">소개 모드 (1)</button><button data-k="qa">질문 모드 (2)</button>' +
     '<button data-k="rand">랜덤 뽑기 (R)</button><button data-k="music">재즈 (M)</button><button data-k="fs">전체화면 (F)</button><span class="st"></span>';
   const stat = bar.querySelector(".st");
+  const juke = mk("div", "juke");
+  juke.innerHTML = '<div class="eq"><i></i><i></i><i></i><i></i></div><div class="tt"><b>LOUNGE</b><b>JAZZ</b></div><button class="play" title="재생·정지 (M)">▶</button><button class="dn" title="소리 줄이기 ([)">−</button><div class="vol">50%</div><button class="up" title="소리 키우기 (])">+</button>';
+  juke.addEventListener("click", e => e.stopPropagation());
+  function jukeSync() { const on = !!(window.KJazz && KJazz.on); juke.classList.toggle("on", on); juke.querySelector(".play").textContent = on ? "❚❚" : "▶"; juke.querySelector(".vol").textContent = Math.round((window.KJazz ? KJazz.volume : .5) * 100) + "%"; const mb = bar.querySelector("[data-k=music]"); if (mb) mb.classList.toggle("on", on); }
+  function jukeVol(d) { if (!window.KJazz) return; KJazz.setVolume(Math.round((KJazz.volume + d) * 10) / 10); jukeSync(); }
+  juke.querySelector(".play").onclick = e => { e.currentTarget.blur(); act("music"); };
+  juke.querySelector(".dn").onclick = e => { e.currentTarget.blur(); jukeVol(-.1); };
+  juke.querySelector(".up").onclick = e => { e.currentTarget.blur(); jukeVol(.1); };
+  juke.querySelectorAll("button").forEach(b => b.tabIndex = -1);
   bar.querySelectorAll("button").forEach(b => { b.tabIndex = -1; b.onclick = e => { e.stopPropagation(); b.blur(); act(b.dataset.k); }; });
   function setMode(m) { stopRoll(); mode = m; clearSel(); bar.querySelector('[data-k=intro]').classList.toggle("on", m === "intro"); bar.querySelector('[data-k=qa]').classList.toggle("on", m === "qa"); qlist.classList.toggle("hidden", m !== "qa"); renderQuestions(); updateLed(); }
   let qrEl = null;
@@ -462,13 +484,13 @@
     else if (k === "intro") setMode("intro");
     else if (k === "qa") { if (mode === "qa") { qf = (qf + 1) % FILTERS.length; clearSel(); renderQuestions(); updateLed(); } else setMode("qa"); }
     else if (k === "rand") { if (mode !== "intro") setMode("intro"); randomPick(); }
-    else if (k === "music" && window.KJazz) { const on = KJazz.toggle(); bar.querySelector('[data-k=music]').classList.toggle("on", on); toast(on ? "🎷 라운지 재즈 켬 (M으로 끄기, [ ]로 소리 조절)" : "음악 끔"); }
+    else if (k === "music" && window.KJazz) { const on = KJazz.toggle(); jukeSync(); toast(on ? "🎷 라운지 재즈 켬" : "음악 끔"); }
     else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
   }
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") { if (qrEl) toggleQR(); else { stopRoll(); clearSel(); } }
     else if (e.key === "Enter") { e.preventDefault(); const b = card.querySelector('[data-a=done]'); if (b && !card.classList.contains("hidden")) b.click(); }
-    else if ((e.key === "[" || e.key === "]") && window.KJazz) { KJazz.setVolume(KJazz.volume + (e.key === "]" ? .1 : -.1)); toast("음악 소리 " + Math.round(KJazz.volume * 100) + "%"); }
+    else if ((e.key === "[" || e.key === "]") && window.KJazz) { jukeVol(e.key === "]" ? .1 : -.1); }
     else ({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs", m: "music" })[e.key.toLowerCase()] && act(({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs", m: "music" })[e.key.toLowerCase()]);
   });
   let hideT; document.addEventListener("mousemove", () => { bar.classList.add("show"); clearTimeout(hideT); hideT = setTimeout(() => bar.classList.remove("show"), 2500); });
