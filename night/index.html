@@ -67,6 +67,9 @@
   .targets.mbti { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .targets.mbti button { padding: 8px 0; border-radius: 4px; font-size: 13px; }
   .targets.mbti button:last-child { grid-column: span 4; }
+  label.anon { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; font-size: 13.5px; margin-top: 12px; }
+  label.anon input { width: 18px; height: 18px; margin-top: 2px; flex: none; }
+  label.anon small { color: var(--muted); display: block; }
   .mine { margin: 14px 0 0; padding: 0; list-style: none; }
   .mine li { font-size: 13px; border-top: 1px solid var(--line); padding: 9px 0; color: var(--muted); }
   .mine li b { color: var(--ink); font-weight: 700; }
@@ -148,6 +151,7 @@
         <div id="targets"></div>
         <label>질문</label>
         <textarea id="iAsk" maxlength="120" required placeholder="예: 의사과학자로 창업할 때 가장 먼저 포기해야 했던 것은?"></textarea>
+        <label class="anon"><input type="checkbox" id="iAnon"> 익명으로 보내기 <small>(화면에 이름 대신 "익명"으로 보이고, 내 캐릭터에 말풍선이 뜨지 않습니다)</small></label>
         <button class="btn" type="submit">질문 보내기</button>
       </form>
       <ul class="mine" id="mine"></ul>
@@ -161,8 +165,8 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=6"></script>
-<script src="night.js?v=6"></script>
+<script src="config.js?v=7"></script>
+<script src="night.js?v=7"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -279,14 +283,15 @@
       b.onclick = () => { target = t; part = g.part; tg.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }; box.appendChild(b); });
   });
 
-  function renderMine() { const ul = $("mine"); ul.innerHTML = ""; get(ASK_KEY, []).slice().reverse().forEach(a => { const li = document.createElement("li"); li.innerHTML = "<b></b> → "; li.firstChild.textContent = a.target; li.appendChild(document.createTextNode(a.ask)); ul.appendChild(li); }); }
+  function renderMine() { const ul = $("mine"); ul.innerHTML = ""; get(ASK_KEY, []).slice().reverse().forEach(a => { const li = document.createElement("li"); li.innerHTML = "<b></b> → "; li.firstChild.textContent = a.target + (a.anon ? " (익명)" : ""); li.appendChild(document.createTextNode(a.ask)); ul.appendChild(li); }); }
 
   $("fAsk").addEventListener("submit", async e => {
     e.preventDefault();
     const me = get(ME_KEY, null) || memMe; const text = $("iAsk").value.trim(); if (!me || !text) { if (!text) toast("질문을 써 주세요"); return; }
     if (!target) { toast("누구에게 묻는지 골라 주세요"); return; }
     const btn = e.target.querySelector("button[type=submit]"); if (btn.disabled) return; btn.disabled = true;
-    const a = { kind: "ask", cid: K.myId(), name: me.name, target, part, ask: text };
+    const anon = $("iAnon").checked;
+    const a = { kind: "ask", cid: K.myId(), name: anon ? "익명" : me.name, anon, target, part, ask: text };
     try { await K.submit(a); } catch (err) { btn.disabled = false; toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
     btn.disabled = false;
     const list = get(ASK_KEY, []); list.push(a); set(ASK_KEY, list);

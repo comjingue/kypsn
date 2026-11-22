@@ -73,6 +73,12 @@
   .card .mb { display: inline-block; margin-left: .6cqw; padding: .25cqw .5cqw; background: var(--gold); color: #1A1406; border-radius: .3cqw; }
   .card .q { font-size: 2.4cqw; font-weight: 900; line-height: 1.4; margin-top: 1.2cqw; }
   .card .btns { display: flex; gap: .8cqw; margin-top: 1.6cqw; }
+  .card .timer { display: flex; align-items: center; gap: .8cqw; margin-top: 1.4cqw; }
+  .card .timer .tl { font-size: 1cqw; font-weight: 700; color: #C9D3F0; white-space: nowrap; }
+  .card .timer .tb { flex: 1; height: .7cqw; background: #0B1228; border-radius: .4cqw; overflow: hidden; }
+  .card .timer .tb i { display: block; height: 100%; width: 100%; background: #3FA796; transition: width .2s linear; }
+  .card .timer .tn { font-size: 1.4cqw; font-weight: 900; min-width: 2.4cqw; text-align: right; }
+  .card .timer.warn .tb i { background: var(--gold); } .card .timer.over .tb i { background: #C25B4E; } .card .timer.over .tn { color: #FF8A7A; }
   .card .btns button { flex: 1; font: inherit; font-size: 1.1cqw; font-weight: 900; padding: .8cqw; border-radius: .4cqw; border: .15cqw solid #2C3866; background: #0B1228; color: var(--ink); cursor: pointer; }
   .card .btns button.pri { background: var(--gold); color: #1A1406; border-color: var(--gold); }
 
@@ -113,8 +119,9 @@
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="../config.js?v=6"></script>
-<script src="../night.js?v=6"></script>
+<script src="../config.js?v=7"></script>
+<script src="../night.js?v=7"></script>
+<script src="../jazz.js?v=7"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -319,7 +326,8 @@
   // ── 질문 ────────────────────────────────────────────────
   function addAsk(e) {
     const key = e.cid + "|" + e.ts + "|" + e.ask; if (asks.has(key)) return false;
-    asks.set(key, { key, cid: e.cid, name: e.name, target: e.target || "패널 전체", part: e.part || "", ask: e.ask, ts: e.ts }); return true;
+    const anon = e.anon === true || e.anon === "1" || e.anon === "true";
+    asks.set(key, { key, cid: e.cid, anon, name: anon ? "익명" : e.name, target: e.target || "패널 전체", part: e.part || "", ask: e.ask, ts: e.ts }); return true;
   }
   // 질문 거르기: 전체 / 2부 연사별 / 3부 패널 (질문 모드에서 2를 다시 누르면 다음 칸)
   const GROUPS = CFG.qaGroups || [{ part: "panel", label: "패널", targets: CFG.targets || ["패널 전체"] }];
@@ -336,12 +344,12 @@
     FILTERS.forEach((fl, i) => { const b = mk("button", i === qf ? "on" : "", qfBox); b.textContent = fl.label + " " + [...asks.values()].filter(a => !mod.hidden[a.cid] && !mod.qdone[a.key] && fl.ok(a)).length; b.onclick = ev => { ev.stopPropagation(); qf = i; clearSel(); renderQuestions(); updateLed(); }; });
     qlist.querySelector("h3").textContent = FILTERS[qf].label + " 질문 " + list.length + "개 · 눌러서 크게 보기";
     list.forEach(a => {
-      const it = mk("div", "qitem" + (mod.qdone[a.key] ? " done" : ""), qlist); const c = mk("canvas", "", it); K.draw(c, keyFor(a), 2, 0, lookOf(a.cid));
+      const it = mk("div", "qitem" + (mod.qdone[a.key] ? " done" : ""), qlist); const c = mk("canvas", "", it); if (a.anon) drawAnon(c, 2); else K.draw(c, keyFor(a), 2, 0, lookOf(a.cid));
       const tx = mk("div", "", it); tx.innerHTML = '<div class="tg"></div><div class="tx"></div>'; tx.firstChild.textContent = a.name + " → " + a.target; tx.lastChild.textContent = a.ask;
       it.onclick = () => showAsk(a);
     });
     people.forEach(p => {
-      const has = list.some(a => a.cid === p.cid && !mod.qdone[a.key]);  // 거른 질문만 말풍선
+      const has = list.some(a => a.cid === p.cid && !a.anon && !mod.qdone[a.key]);  // 거른 질문만, 익명 제외
       let b = p.el.querySelector(".bubble");
       if (mode === "qa" && has) { if (!b) { b = mk("div", "bubble", p.el); b.textContent = "?"; } } else if (b) b.remove();
     });
@@ -351,10 +359,16 @@
   const spot = mk("div", "spot hidden"), card = mk("div", "card hidden");
   // 글이 길어 카드가 화면을 넘치면 카드 전체를 줄인다
   function fitCard() { card.style.zoom = 1; let z = 1; while (z > .55 && card.offsetHeight * z > world.clientHeight * .9) { z -= .05; card.style.zoom = z; } }
-  function clearSel() { if (selected) selected.el.classList.remove("sel"); selected = null; spot.classList.add("hidden"); card.classList.add("hidden"); }
+  function clearSel() { if (selected) selected.el.classList.remove("sel"); selected = null; spot.classList.add("hidden"); card.classList.add("hidden"); clearInterval(introT); if (window.KJazz) KJazz.duck(false); }
+  // 익명 질문용 회색 실루엣
+  function drawAnon(cv, s) { cv.width = 16 * s; cv.height = 20 * s; const x = cv.getContext("2d"); x.fillStyle = "#5C6690";
+    [[5, 2, 6, 6], [6, 8, 4, 1], [4, 9, 8, 6], [3, 10, 1, 4], [12, 10, 1, 4], [5, 15, 2, 3], [9, 15, 2, 3]].forEach(([a, b, w, h]) => x.fillRect(a * s, b * s, w * s, h * s));
+    x.fillStyle = "#E2B857"; x.fillRect(7 * s, 3 * s, 2 * s, 1 * s); x.fillRect(8 * s, 4 * s, 1 * s, 1 * s); x.fillRect(7 * s, 5 * s, 1 * s, 1 * s); x.fillRect(7 * s, 7 * s, 1 * s, 1 * s); }
+  // 30초 자기소개 타이머
+  let introT = null;
   function spotOn(p) { card.classList.toggle("left", p.x > W / 2); place(spot, p.x - 22, p.y - 34, 44, 44); spot.classList.remove("hidden"); p.el.classList.add("sel"); selected = p; }
   function select(p) {
-    if (mode === "qa") { const a = qVisible().find(a => a.cid === p.cid && !mod.qdone[a.key]); if (a) return showAsk(a); }
+    if (mode === "qa") { const a = qVisible().find(a => a.cid === p.cid && !a.anon && !mod.qdone[a.key]); if (a) return showAsk(a); }
     clearSel(); spotOn(p);
     const esc = s => String(s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
     const chips = s => String(s || "").split(", ").filter(Boolean).map(v => '<span class="chip">' + esc(v) + "</span>").join("");
@@ -363,18 +377,22 @@
       (p.interest ? '<div class="row"><div class="k">관심 분야</div><div class="chips">' + chips(p.interest) + "</div></div>" : "") +
       row("요즘 진로 고민", p.question) +
       '<div class="two">' + row("오늘 만나고 싶은 사람", p.meet) + row("의사가 안 됐다면", p.ifnot) + "</div>" +
+      '<div class="timer"><div class="tl">30초 자기소개</div><div class="tb"><i></i></div><div class="tn">30</div></div>' +
       '<div class="btns"><button class="pri" data-a="done">소개 끝 ★ (Enter)</button><button data-a="close">닫기 (Esc)</button><button data-a="hide">화면에서 숨기기</button></div>';
     K.draw(card.querySelector("canvas"), keyOf(p.name, p.cid), 8, 0, K.look(p.pos, p.sex));
     card.querySelector('[data-a=done]').onclick = () => { mod.done[p.cid] = 1; saveMod(); p.el.classList.add("done"); clearSel(); updateLed(); };
     card.querySelector('[data-a=close]').onclick = clearSel;
     card.querySelector('[data-a=hide]').onclick = () => { mod.hidden[p.cid] = 1; saveMod(); p.el.classList.add("hidden"); clearSel(); updateLed(); };
     card.classList.remove("hidden"); fitCard();
+    if (window.KJazz) KJazz.duck(true);
+    const t0 = Date.now(), tb = card.querySelector(".tb i"), tn = card.querySelector(".tn"), tm = card.querySelector(".timer");
+    clearInterval(introT); introT = setInterval(() => { const left = Math.max(0, 30 - (Date.now() - t0) / 1000); tb.style.width = (left / 30 * 100) + "%"; tn.textContent = Math.ceil(left); tm.classList.toggle("warn", left <= 10); tm.classList.toggle("over", left <= 0); if (left <= 0) clearInterval(introT); }, 200);
   }
   function showAsk(a) {
-    clearSel(); const p = people.get(a.cid); if (p) spotOn(p);
+    clearSel(); const p = a.anon ? null : people.get(a.cid); if (p) spotOn(p); else card.classList.remove("left");
     card.innerHTML = '<div class="top"><canvas></canvas><div><div class="lab px">QUESTION</div><div class="nm"></div><div class="rl"></div></div></div><div class="q"></div>' +
       '<div class="btns"><button class="pri" data-a="done">답변 끝 (Enter)</button><button data-a="close">닫기 (Esc)</button></div>';
-    K.draw(card.querySelector("canvas"), keyFor(a), 8, 0, lookOf(a.cid));
+    if (a.anon) drawAnon(card.querySelector("canvas"), 8); else K.draw(card.querySelector("canvas"), keyFor(a), 8, 0, lookOf(a.cid));
     card.querySelector(".nm").textContent = a.name; card.querySelector(".rl").textContent = "→ " + a.target; card.querySelector(".q").textContent = a.ask;
     card.querySelector('[data-a=done]').onclick = () => { mod.qdone[a.key] = 1; saveMod(); clearSel(); renderQuestions(); updateLed(); };
     card.querySelector('[data-a=close]').onclick = clearSel;
@@ -427,7 +445,7 @@
   const bar = mk("div", "bar");
   bar.innerHTML = '<span class="badge px">' + (DEMO ? "DEMO" : K.LIVE ? "LIVE" : "LOCAL") + '</span>' +
     '<button data-k="qr">체크인 QR (C)</button><button data-k="intro" class="on">소개 모드 (1)</button><button data-k="qa">질문 모드 (2)</button>' +
-    '<button data-k="rand">랜덤 뽑기 (R)</button><button data-k="fs">전체화면 (F)</button><span class="st"></span>';
+    '<button data-k="rand">랜덤 뽑기 (R)</button><button data-k="music">재즈 (M)</button><button data-k="fs">전체화면 (F)</button><span class="st"></span>';
   const stat = bar.querySelector(".st");
   bar.querySelectorAll("button").forEach(b => { b.tabIndex = -1; b.onclick = e => { e.stopPropagation(); b.blur(); act(b.dataset.k); }; });
   function setMode(m) { stopRoll(); mode = m; clearSel(); bar.querySelector('[data-k=intro]').classList.toggle("on", m === "intro"); bar.querySelector('[data-k=qa]').classList.toggle("on", m === "qa"); qlist.classList.toggle("hidden", m !== "qa"); renderQuestions(); updateLed(); }
@@ -444,12 +462,14 @@
     else if (k === "intro") setMode("intro");
     else if (k === "qa") { if (mode === "qa") { qf = (qf + 1) % FILTERS.length; clearSel(); renderQuestions(); updateLed(); } else setMode("qa"); }
     else if (k === "rand") { if (mode !== "intro") setMode("intro"); randomPick(); }
+    else if (k === "music" && window.KJazz) { const on = KJazz.toggle(); bar.querySelector('[data-k=music]').classList.toggle("on", on); toast(on ? "🎷 라운지 재즈 켬 (M으로 끄기, [ ]로 소리 조절)" : "음악 끔"); }
     else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
   }
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") { if (qrEl) toggleQR(); else { stopRoll(); clearSel(); } }
     else if (e.key === "Enter") { e.preventDefault(); const b = card.querySelector('[data-a=done]'); if (b && !card.classList.contains("hidden")) b.click(); }
-    else ({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs" })[e.key.toLowerCase()] && act(({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs" })[e.key.toLowerCase()]);
+    else if ((e.key === "[" || e.key === "]") && window.KJazz) { KJazz.setVolume(KJazz.volume + (e.key === "]" ? .1 : -.1)); toast("음악 소리 " + Math.round(KJazz.volume * 100) + "%"); }
+    else ({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs", m: "music" })[e.key.toLowerCase()] && act(({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs", m: "music" })[e.key.toLowerCase()]);
   });
   let hideT; document.addEventListener("mousemove", () => { bar.classList.add("show"); clearTimeout(hideT); hideT = setTimeout(() => bar.classList.remove("show"), 2500); });
 

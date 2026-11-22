@@ -39,8 +39,8 @@
 </header>
 <main id="list"></main>
 
-<script src="../config.js?v=6"></script>
-<script src="../night.js?v=6"></script>
+<script src="../config.js?v=7"></script>
+<script src="../night.js?v=7"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -68,7 +68,7 @@
       d.querySelector("b").textContent = "→ " + a.target;
       d.querySelector(".meta span").textContent = (GROUPS.find(g => g.part === partOf(a)) || {}).label || "";
       d.querySelector(".tx").textContent = a.ask;
-      d.querySelector(".who").textContent = (names[a.cid] || a.name || "") + (names[a.cid + "#role"] ? " · " + names[a.cid + "#role"] : "");
+      d.querySelector(".who").textContent = a.anon ? "익명 질문" : (names[a.cid] || a.name || "") + (names[a.cid + "#role"] ? " · " + names[a.cid + "#role"] : "");
       const b = d.querySelector("button"); b.textContent = mod.qdone[a.key] ? "다시 안 읽음으로" : "읽었음";
       b.onclick = () => { if (mod.qdone[a.key]) delete mod.qdone[a.key]; else mod.qdone[a.key] = 1; save(); render(); };
       listEl.appendChild(d);
@@ -81,7 +81,7 @@
     entries.forEach(e => {
       if (!e || !e.cid) return;
       if (e.kind === "intro") { if (!names[e.cid + "#ts"] || String(e.ts) >= names[e.cid + "#ts"]) { names[e.cid] = e.name; names[e.cid + "#role"] = e.role; names[e.cid + "#ts"] = String(e.ts || ""); } }
-      else if (e.kind === "ask" && !mod.hidden[e.cid]) { const key = e.cid + "|" + e.ts + "|" + e.ask; if (!m.has(key)) m.set(key, { key, cid: e.cid, name: e.name, target: e.target || "패널 전체", part: e.part || "", ask: e.ask, ts: e.ts }); }
+      else if (e.kind === "ask" && !mod.hidden[e.cid]) { const key = e.cid + "|" + e.ts + "|" + e.ask; const anon = e.anon === true || e.anon === "1" || e.anon === "true"; if (!m.has(key)) m.set(key, { key, cid: e.cid, anon, name: anon ? "익명" : e.name, target: e.target || "패널 전체", part: e.part || "", ask: e.ask, ts: e.ts }); }
     });
     const fresh = seenKeys ? new Set([...m.keys()].filter(k => !seenKeys.has(k))) : new Set();
     seenKeys = new Set(m.keys());
