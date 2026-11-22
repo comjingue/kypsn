@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>KYPSN Night · 사회자 질문 목록</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0E1630; --navy2:#17224A; --ink:#F3EEDF; --muted:#AEB6CF; --gold:#E2B857; --line:#2C3866; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--navy); color: var(--ink); font-family: "Noto Sans KR", system-ui, sans-serif; }
+  header { position: sticky; top: 0; background: var(--navy); padding: 14px 16px 10px; border-bottom: 1px solid var(--line); z-index: 2; }
+  h1 { margin: 0 0 10px; font-size: 17px; font-weight: 900; }
+  h1 small { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .f { display: flex; flex-wrap: wrap; gap: 8px; }
+  .f button { font: inherit; font-size: 14px; font-weight: 700; color: var(--ink); background: #0B1228; border: 2px solid var(--line); border-radius: 18px; padding: 7px 13px; cursor: pointer; }
+  .f button.on { background: var(--gold); color: #1A1406; border-color: var(--gold); }
+  .f label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); margin-left: auto; }
+  main { padding: 8px 16px 40px; max-width: 900px; margin: 0 auto; }
+  .q { background: var(--navy2); border: 2px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-top: 12px; }
+  .q .meta { font-size: 13px; color: var(--gold); font-weight: 700; display: flex; gap: 8px; align-items: center; }
+  .q .meta span { color: var(--muted); font-weight: 400; }
+  .q .tx { font-size: 21px; font-weight: 700; line-height: 1.45; margin-top: 6px; overflow-wrap: anywhere; }
+  .q .who { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .q button { margin-top: 10px; font: inherit; font-size: 14px; font-weight: 900; padding: 8px 14px; border-radius: 6px; border: 0; background: var(--gold); color: #1A1406; cursor: pointer; }
+  .q.done { opacity: .4; }
+  .q.done button { background: #2C3866; color: var(--ink); }
+  .q.new { border-color: var(--gold); }
+  .empty { color: var(--muted); text-align: center; margin-top: 40px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>사회자 질문 목록 <small id="st">불러오는 중…</small></h1>
+  <div class="f" id="f"></div>
+</header>
+<main id="list"></main>
+
+<script src="../config.js?v=6"></script>
+<script src="../night.js?v=6"></script>
+<script>
+(function () {
+  const K = window.KNight, CFG = K.CFG;
+  const STK = "kypsn-night-stage";   // 무대 화면과 같은 기기면 "읽음" 표시를 함께 쓴다
+  const mod = (() => { try { return JSON.parse(localStorage.getItem(STK)) || {}; } catch (e) { return {}; } })();
+  mod.qdone = mod.qdone || {}; mod.hidden = mod.hidden || {};
+  const save = () => { try { const cur = JSON.parse(localStorage.getItem(STK) || "{}"); cur.qdone = Object.assign(cur.qdone || {}, mod.qdone); localStorage.setItem(STK, JSON.stringify(cur)); } catch (e) {} };
+  const GROUPS = CFG.qaGroups || [{ part: "panel", label: "패널", targets: CFG.targets || ["패널 전체"] }];
+  const partOf = a => a.part || ((GROUPS.find(g => g.targets.includes(a.target)) || GROUPS[GROUPS.length - 1]).part);
+  const FILTERS = [{ label: "전체", ok: () => true }];
+  GROUPS.forEach(g => { if (g.part === "talk") g.targets.forEach(t => FILTERS.push({ label: t, ok: a => partOf(a) === "talk" && a.target === t })); else FILTERS.push({ label: g.label, ok: a => partOf(a) === g.part }); });
+  let qf = 0, showDone = false, asks = [], names = {}, seenKeys = null;
+  const fBox = document.getElementById("f"), listEl = document.getElementById("list"), st = document.getElementById("st");
+
+  function render() {
+    fBox.innerHTML = "";
+    FILTERS.forEach((fl, i) => { const b = document.createElement("button"); b.textContent = fl.label + " " + asks.filter(a => fl.ok(a) && !mod.qdone[a.key]).length; if (i === qf) b.className = "on"; b.onclick = () => { qf = i; render(); }; fBox.appendChild(b); });
+    const lab = document.createElement("label"); lab.innerHTML = '<input type="checkbox"> 읽은 것도 보기'; lab.firstChild.checked = showDone; lab.firstChild.onchange = e => { showDone = e.target.checked; render(); }; fBox.appendChild(lab);
+    const list = asks.filter(a => FILTERS[qf].ok(a) && (showDone || !mod.qdone[a.key])).sort((a, b) => (mod.qdone[a.key] ? 1 : 0) - (mod.qdone[b.key] ? 1 : 0) || String(a.ts).localeCompare(String(b.ts)));
+    listEl.innerHTML = "";
+    if (!list.length) { const d = document.createElement("div"); d.className = "empty"; d.textContent = "아직 질문이 없습니다"; listEl.appendChild(d); }
+    list.forEach(a => {
+      const d = document.createElement("div"); d.className = "q" + (mod.qdone[a.key] ? " done" : "") + (a.fresh ? " new" : "");
+      d.innerHTML = '<div class="meta"><b></b><span></span></div><div class="tx"></div><div class="who"></div><button></button>';
+      d.querySelector("b").textContent = "→ " + a.target;
+      d.querySelector(".meta span").textContent = (GROUPS.find(g => g.part === partOf(a)) || {}).label || "";
+      d.querySelector(".tx").textContent = a.ask;
+      d.querySelector(".who").textContent = (names[a.cid] || a.name || "") + (names[a.cid + "#role"] ? " · " + names[a.cid + "#role"] : "");
+      const b = d.querySelector("button"); b.textContent = mod.qdone[a.key] ? "다시 안 읽음으로" : "읽었음";
+      b.onclick = () => { if (mod.qdone[a.key]) delete mod.qdone[a.key]; else mod.qdone[a.key] = 1; save(); render(); };
+      listEl.appendChild(d);
+    });
+    st.textContent = "질문 " + asks.length + "개 · " + (K.LIVE ? "실시간" : "로컬 시험");
+  }
+
+  K.listen(entries => {
+    const m = new Map();
+    entries.forEach(e => {
+      if (!e || !e.cid) return;
+      if (e.kind === "intro") { if (!names[e.cid + "#ts"] || String(e.ts) >= names[e.cid + "#ts"]) { names[e.cid] = e.name; names[e.cid + "#role"] = e.role; names[e.cid + "#ts"] = String(e.ts || ""); } }
+      else if (e.kind === "ask" && !mod.hidden[e.cid]) { const key = e.cid + "|" + e.ts + "|" + e.ask; if (!m.has(key)) m.set(key, { key, cid: e.cid, name: e.name, target: e.target || "패널 전체", part: e.part || "", ask: e.ask, ts: e.ts }); }
+    });
+    const fresh = seenKeys ? new Set([...m.keys()].filter(k => !seenKeys.has(k))) : new Set();
+    seenKeys = new Set(m.keys());
+    asks = [...m.values()].map(a => Object.assign(a, { fresh: fresh.has(a.key) }));
+    render();
+  }, CFG.pollMs);
+  render();
+})();
+</script>
+</body>
+</html>

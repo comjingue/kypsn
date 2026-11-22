@@ -157,7 +157,7 @@
     const labels = json.table.cols.map(c => (c.label || "").trim().toLowerCase());
     return json.table.rows.map(r => {
       const o = {}; labels.forEach((l, i) => { const c = r.c[i]; o[l] = c ? (c.f != null ? c.f : c.v) : ""; });
-      return { kind: o.kind, cid: o.cid, name: o.name, role: o.role, question: o.question, meet: o.meet, target: o.target, ask: o.ask, ts: o.timestamp || o["타임스탬프"] || "" };
+      return { kind: o.kind, cid: o.cid, name: o.name, role: o.role, question: o.question, meet: o.meet, target: o.target, part: o.part, ask: o.ask, ts: o.timestamp || o["타임스탬프"] || "" };
     });
   }
 

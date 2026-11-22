@@ -77,6 +77,9 @@
   .card .btns button.pri { background: var(--gold); color: #1A1406; border-color: var(--gold); }
 
   .qlist { position: absolute; left: 1.2cqw; top: 1.2cqw; bottom: 5.4cqw; width: 26cqw; background: rgba(8,12,28,.9); border: .15cqw solid #2C3866; border-radius: .6cqw; padding: 1cqw; z-index: 960; overflow-y: auto; }
+  .qf { display: flex; flex-wrap: wrap; gap: .4cqw; margin-bottom: .8cqw; }
+  .qf button { font: inherit; font-size: .85cqw; font-weight: 700; color: #C9D3F0; background: #0B1228; border: .12cqw solid #2C3866; border-radius: 1cqw; padding: .25cqw .7cqw; cursor: pointer; }
+  .qf button.on { color: #1A1406; background: var(--gold); border-color: var(--gold); }
   .qlist h3 { margin: 0 0 .6cqw; font-size: 1.2cqw; color: var(--gold); }
   .qitem { display: flex; gap: .7cqw; padding: .7cqw .4cqw; border-top: .1cqw solid #2C3866; cursor: pointer; align-items: flex-start; }
   .qitem:hover { background: #17224A; }
@@ -110,8 +113,8 @@
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="../config.js?v=5"></script>
-<script src="../night.js?v=5"></script>
+<script src="../config.js?v=6"></script>
+<script src="../night.js?v=6"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -316,19 +319,29 @@
   // ── 질문 ────────────────────────────────────────────────
   function addAsk(e) {
     const key = e.cid + "|" + e.ts + "|" + e.ask; if (asks.has(key)) return false;
-    asks.set(key, { key, cid: e.cid, name: e.name, target: e.target || "패널 전체", ask: e.ask, ts: e.ts }); return true;
+    asks.set(key, { key, cid: e.cid, name: e.name, target: e.target || "패널 전체", part: e.part || "", ask: e.ask, ts: e.ts }); return true;
   }
+  // 질문 거르기: 전체 / 2부 연사별 / 3부 패널 (질문 모드에서 2를 다시 누르면 다음 칸)
+  const GROUPS = CFG.qaGroups || [{ part: "panel", label: "패널", targets: CFG.targets || ["패널 전체"] }];
+  const partOf = a => a.part || ((GROUPS.find(g => g.targets.includes(a.target)) || GROUPS[GROUPS.length - 1]).part);
+  const FILTERS = [{ id: "all", label: "전체", ok: () => true }];
+  GROUPS.forEach(g => { if (g.part === "talk") g.targets.forEach(t => FILTERS.push({ id: "t:" + t, label: t, ok: a => partOf(a) === "talk" && a.target === t })); else FILTERS.push({ id: "p:" + g.part, label: g.label, ok: a => partOf(a) === g.part }); });
+  let qf = 0;
   const qlist = mk("div", "qlist hidden");
+  function qVisible() { return [...asks.values()].filter(a => !mod.hidden[a.cid] && FILTERS[qf].ok(a)); }
   function renderQuestions() {
-    const list = [...asks.values()].filter(a => !mod.hidden[a.cid]).sort((a, b) => (mod.qdone[a.key] ? 1 : 0) - (mod.qdone[b.key] ? 1 : 0) || String(b.ts).localeCompare(String(a.ts)));
-    qlist.innerHTML = "<h3>질문 " + list.length + "개 · 눌러서 크게 보기</h3>";
+    const list = qVisible().sort((a, b) => (mod.qdone[a.key] ? 1 : 0) - (mod.qdone[b.key] ? 1 : 0) || String(b.ts).localeCompare(String(a.ts)));
+    qlist.innerHTML = '<div class="qf"></div><h3></h3>';
+    const qfBox = qlist.firstChild;
+    FILTERS.forEach((fl, i) => { const b = mk("button", i === qf ? "on" : "", qfBox); b.textContent = fl.label + " " + [...asks.values()].filter(a => !mod.hidden[a.cid] && !mod.qdone[a.key] && fl.ok(a)).length; b.onclick = ev => { ev.stopPropagation(); qf = i; clearSel(); renderQuestions(); updateLed(); }; });
+    qlist.querySelector("h3").textContent = FILTERS[qf].label + " 질문 " + list.length + "개 · 눌러서 크게 보기";
     list.forEach(a => {
       const it = mk("div", "qitem" + (mod.qdone[a.key] ? " done" : ""), qlist); const c = mk("canvas", "", it); K.draw(c, keyFor(a), 2, 0, lookOf(a.cid));
       const tx = mk("div", "", it); tx.innerHTML = '<div class="tg"></div><div class="tx"></div>'; tx.firstChild.textContent = a.name + " → " + a.target; tx.lastChild.textContent = a.ask;
       it.onclick = () => showAsk(a);
     });
     people.forEach(p => {
-      const has = list.some(a => a.cid === p.cid && !mod.qdone[a.key]);
+      const has = list.some(a => a.cid === p.cid && !mod.qdone[a.key]);  // 거른 질문만 말풍선
       let b = p.el.querySelector(".bubble");
       if (mode === "qa" && has) { if (!b) { b = mk("div", "bubble", p.el); b.textContent = "?"; } } else if (b) b.remove();
     });
@@ -341,7 +354,7 @@
   function clearSel() { if (selected) selected.el.classList.remove("sel"); selected = null; spot.classList.add("hidden"); card.classList.add("hidden"); }
   function spotOn(p) { card.classList.toggle("left", p.x > W / 2); place(spot, p.x - 22, p.y - 34, 44, 44); spot.classList.remove("hidden"); p.el.classList.add("sel"); selected = p; }
   function select(p) {
-    if (mode === "qa") { const a = [...asks.values()].find(a => a.cid === p.cid && !mod.qdone[a.key]); if (a) return showAsk(a); }
+    if (mode === "qa") { const a = qVisible().find(a => a.cid === p.cid && !mod.qdone[a.key]); if (a) return showAsk(a); }
     clearSel(); spotOn(p);
     const esc = s => String(s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
     const chips = s => String(s || "").split(", ").filter(Boolean).map(v => '<span class="chip">' + esc(v) + "</span>").join("");
@@ -398,7 +411,7 @@
   let ledI = 0; setInterval(() => { ledI++; updateLed(); }, 5000);
   function updateLed() {
     const m = document.getElementById("ledMsg");
-    if (mode === "qa") { const open = [...asks.values()].filter(a => !mod.qdone[a.key] && !mod.hidden[a.cid]).length; m.textContent = "Q&A · 남은 질문 " + open + "개"; }
+    if (mode === "qa") { const open = qVisible().filter(a => !mod.qdone[a.key]).length; m.textContent = "Q&A · " + (qf ? FILTERS[qf].label + " · " : "") + "남은 질문 " + open + "개"; }
     else {
       const vis = [...people.values()].filter(p => !mod.hidden[p.cid]);
       const top = (field, skip) => { const c = {}; vis.forEach(p => String(p[field] || "").split(", ").filter(v => v && v !== skip).forEach(v => c[v] = (c[v] || 0) + 1)); const b = Object.entries(c).sort((a, b) => b[1] - a[1])[0]; return b; };
@@ -429,7 +442,7 @@
   function act(k) {
     if (k === "qr") toggleQR();
     else if (k === "intro") setMode("intro");
-    else if (k === "qa") setMode("qa");
+    else if (k === "qa") { if (mode === "qa") { qf = (qf + 1) % FILTERS.length; clearSel(); renderQuestions(); updateLed(); } else setMode("qa"); }
     else if (k === "rand") { if (mode !== "intro") setMode("intro"); randomPick(); }
     else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
   }
@@ -489,7 +502,7 @@
   }
   updateLed();
   // 시뮬레이션·점검용 읽기 전용 창구
-  window.__kn = { people, asks, queue, walkers, mod, get mode() { return mode; }, get selected() { return selected; }, card, qlist, world };
+  window.__kn = { people, asks, queue, walkers, mod, get qf() { return qf; }, get mode() { return mode; }, get selected() { return selected; }, card, qlist, world };
 })();
 </script>
 </body>

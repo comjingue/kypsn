@@ -143,10 +143,9 @@
 
     <div class="card">
       <h2><span class="px">Q&amp;A</span> 질문 남기기</h2>
-      <p class="hint">질문을 보내면 내 캐릭터 머리 위에 말풍선이 뜹니다. 패널 토론 때 사회자가 골라 읽습니다.</p>
+      <p class="hint">2부 강연 연사나 3부 패널에게 질문을 보내세요. 사회자가 순서마다 골라 읽고, 무대 화면에서는 내 캐릭터 머리 위에 말풍선이 뜹니다.</p>
       <form id="fAsk" autocomplete="off">
-        <label>누구에게</label>
-        <div class="targets" id="targets"></div>
+        <div id="targets"></div>
         <label>질문</label>
         <textarea id="iAsk" maxlength="120" required placeholder="예: 의사과학자로 창업할 때 가장 먼저 포기해야 했던 것은?"></textarea>
         <button class="btn" type="submit">질문 보내기</button>
@@ -162,8 +161,8 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="config.js?v=5"></script>
-<script src="night.js?v=5"></script>
+<script src="config.js?v=6"></script>
+<script src="night.js?v=6"></script>
 <script>
 (function () {
   const K = window.KNight, CFG = K.CFG;
@@ -269,18 +268,25 @@
   }
 
   // ── 질문 ──
-  let target = (CFG.targets || ["패널 전체"])[0];
+  // 질문 대상: 2부 강연 / 3부 패널 묶음으로 보여 주고 하나를 고른다
+  let target = "", part = "";
   const tg = $("targets");
-  (CFG.targets || ["패널 전체"]).forEach(t => { const b = document.createElement("button"); b.type = "button"; b.textContent = t; if (t === target) b.classList.add("on");
-    b.onclick = () => { target = t; [...tg.children].forEach(x => x.classList.toggle("on", x === b)); }; tg.appendChild(b); });
+  const groups = CFG.qaGroups || [{ part: "panel", label: "누구에게", targets: CFG.targets || ["패널 전체"] }];
+  groups.forEach(g => {
+    const lab = document.createElement("label"); lab.textContent = g.label; tg.appendChild(lab);
+    const box = document.createElement("div"); box.className = "targets"; tg.appendChild(box);
+    g.targets.forEach(t => { const b = document.createElement("button"); b.type = "button"; b.textContent = t;
+      b.onclick = () => { target = t; part = g.part; tg.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }; box.appendChild(b); });
+  });
 
   function renderMine() { const ul = $("mine"); ul.innerHTML = ""; get(ASK_KEY, []).slice().reverse().forEach(a => { const li = document.createElement("li"); li.innerHTML = "<b></b> → "; li.firstChild.textContent = a.target; li.appendChild(document.createTextNode(a.ask)); ul.appendChild(li); }); }
 
   $("fAsk").addEventListener("submit", async e => {
     e.preventDefault();
     const me = get(ME_KEY, null) || memMe; const text = $("iAsk").value.trim(); if (!me || !text) { if (!text) toast("질문을 써 주세요"); return; }
+    if (!target) { toast("누구에게 묻는지 골라 주세요"); return; }
     const btn = e.target.querySelector("button[type=submit]"); if (btn.disabled) return; btn.disabled = true;
-    const a = { kind: "ask", cid: K.myId(), name: me.name, target, ask: text };
+    const a = { kind: "ask", cid: K.myId(), name: me.name, target, part, ask: text };
     try { await K.submit(a); } catch (err) { btn.disabled = false; toast("전송이 안 됐어요. 다시 눌러 주세요"); return; }
     btn.disabled = false;
     const list = get(ASK_KEY, []); list.push(a); set(ASK_KEY, list);

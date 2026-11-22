@@ -13,6 +13,11 @@ window.NIGHT_CONFIG = {
   openChat: "",
   joinUrl: "https://kypsn.org/night/",
   // 질문 대상 (첫 항목이 기본값)
-  targets: ["패널 전체", "최병욱", "백승재", "김윤명"],
+  // 질문 대상: 순서(2부 강연·3부 패널)별 묶음
+  qaGroups: [
+    { part: "talk", label: "2부 강연", targets: ["나원주", "박수용"] },
+    { part: "panel", label: "3부 패널 토론", targets: ["패널 전체", "최병욱", "백승재", "김윤명"] }
+  ],
+  targets: ["나원주", "박수용", "패널 전체", "최병욱", "백승재", "김윤명"],
   pollMs: 4000
 };
