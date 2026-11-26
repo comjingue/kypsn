@@ -19,7 +19,7 @@
   if (dday) {
     var k = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })); k.setHours(0, 0, 0, 0);
     var days = Math.round((new Date(2026, 11, 5) - k) / 86400000);
-    if (days > 0) dday.textContent = 'D-' + days + ' · 신청 마감 11/20';
+    if (days > 0) dday.textContent = 'D-' + days + ' · 참가 신청 마감';
     else if (days === 0) dday.textContent = 'D-DAY · 오늘 18:00';
   }
 

@@ -104,6 +104,8 @@ img { display: block; max-width: 100%; }
 .ticket-meta li { padding: 4px 11px; border-radius: 999px; background: rgba(255,255,255,.09); color: #DCE3F3; font-size: 12.5px; font-weight: 600; }
 .ticket-cut { margin: 22px -30px; border-top: 1.5px dashed rgba(255,255,255,.2); position: relative; }
 .ticket-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.btn.disabled { opacity: .55; pointer-events: none; cursor: default; }
+.live.closed::before { background: var(--gold); box-shadow: none; animation: none; }
 .dday { font-size: 13px; color: var(--gold-soft); font-weight: 700; letter-spacing: .04em; }
 .ticket .btn { min-height: 46px; padding: 0 20px; font-size: 14px; }
 
