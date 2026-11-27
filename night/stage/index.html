@@ -458,7 +458,7 @@
   const bar = mk("div", "bar");
   bar.innerHTML = '<span class="badge px">' + (DEMO ? "DEMO" : K.LIVE ? "LIVE" : "LOCAL") + '</span>' +
     '<button data-k="qr">체크인 QR (C)</button><button data-k="intro" class="on">소개 모드 (1)</button><button data-k="qa">질문 모드 (2)</button>' +
-    '<button data-k="rand">랜덤 뽑기 (R)</button><button data-k="music">재즈 (M)</button><button data-k="fs">전체화면 (F)</button><span class="st"></span>';
+    '<button data-k="rand">랜덤 뽑기 (R)</button><button data-k="music">재즈 (M)</button><button data-k="map">10년 뒤 지도 (G)</button><button data-k="fs">전체화면 (F)</button><span class="st"></span>';
   const stat = bar.querySelector(".st");
   const juke = mk("div", "juke");
   juke.innerHTML = '<div class="eq"><i></i><i></i><i></i><i></i></div><div class="tt"><b>LOUNGE</b><b>JAZZ</b></div><button class="play" title="재생·정지 (M)">▶</button><button class="dn" title="소리 줄이기 ([)">−</button><div class="vol">50%</div><button class="up" title="소리 키우기 (])">+</button>';
@@ -485,13 +485,14 @@
     else if (k === "qa") { if (mode === "qa") { qf = (qf + 1) % FILTERS.length; clearSel(); renderQuestions(); updateLed(); } else setMode("qa"); }
     else if (k === "rand") { if (mode !== "intro") setMode("intro"); randomPick(); }
     else if (k === "music" && window.KJazz) { const on = KJazz.toggle(); jukeSync(); toast(on ? "🎷 라운지 재즈 켬" : "음악 끔"); }
+    else if (k === "map") location.href = "../map/" + (DEMO ? "?demo" : "");
     else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
   }
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") { if (qrEl) toggleQR(); else { stopRoll(); clearSel(); } }
     else if (e.key === "Enter") { e.preventDefault(); const b = card.querySelector('[data-a=done]'); if (b && !card.classList.contains("hidden")) b.click(); }
     else if ((e.key === "[" || e.key === "]") && window.KJazz) { jukeVol(e.key === "]" ? .1 : -.1); }
-    else ({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs", m: "music" })[e.key.toLowerCase()] && act(({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs", m: "music" })[e.key.toLowerCase()]);
+    else ({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs", m: "music", g: "map" })[e.key.toLowerCase()] && act(({ c: "qr", 1: "intro", 2: "qa", r: "rand", f: "fs", m: "music", g: "map" })[e.key.toLowerCase()]);
   });
   let hideT; document.addEventListener("mousemove", () => { bar.classList.add("show"); clearTimeout(hideT); hideT = setTimeout(() => bar.classList.remove("show"), 2500); });
 
